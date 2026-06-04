@@ -138,15 +138,60 @@ Next Action:
 
 ## Builder Handoff / 转交 Builder
 
-When implementation is approved, end with / 实现获批时，以此结尾：
+When implementation is approved, Architect must separate the user-facing judgment from the forwardable Builder instruction. / 实现获批时，Architect 必须区分给 User 的判断与可转发给 Builder 的指令。
+
+### Transferable Instruction Block / 可转发指令块
+
+If User asks for an instruction to forward to Builder, Codex, Reviewer, or another agent, Architect must provide one complete, standalone, continuous block. / 如果 User 要求生成可转发给 Builder、Codex、Reviewer 或其他 agent 的指令，Architect 必须提供一个完整、独立、连续的文本块。
+
+The response should be structured as / 回复结构应为：
 
 ```text
-请将以下内容转发到 Builder 会话：
+[User note: short decision or judgment only, usually 1-3 lines.]
+[给 User 的简短判断：只写结论或需要决策的点，通常 1-3 行。]
+
+Below is the complete instruction to forward. Copy the whole block only.
+下面是可直接转发的完整指令。只复制整个块即可。
+
+[FORWARDABLE BLOCK START]
+... complete instruction for the receiving agent ...
+[FORWARDABLE BLOCK END]
+```
+
+All information required by the receiving agent must be inside the forwardable block. / 接收方执行任务所需的全部信息必须放进可转发块内。
+
+The forwardable block must include, when relevant / 可转发块应按需包含：
+
+- Current state / 当前状态
+- Task name and goal / 任务名称与目标
+- Scope and boundaries / 范围与边界
+- Constraints / 约束
+- Success criteria / 成功标准
+- Validation commands / 验证命令
+- Git rules / Git 要求
+- Forbidden actions / 禁止事项
+- Required report format / 完成报告格式
+
+Do not scatter required context, commands, acceptance criteria, or report format outside the forwardable block. / 不要把关键上下文、命令、验收标准或回报格式散落在可转发块外。
+
+The block must be copy-once usable: User should not need to manually select extra surrounding text or merge multiple blocks. / 文本块必须可一次复制即用：User 不应需要手动选择周边文字或拼接多个文本块。
+
+Architect should also require Builder completion reports to be copy-once usable when giving a Builder task. / Architect 给 Builder 派任务时，也应要求 Builder 的完成报告保持可一次复制。
+
+When Architect asks Builder to report back, the required report format should be inside the forwardable block and should be complete enough for Architect review without extra user explanation. / Architect 要求 Builder 回报时，完成报告格式必须放在可转发块内，并足够完整，使 Architect 审查时不需要 User 额外补充。
+
+For ordinary Builder handoff, use this block content / 普通 Builder 转交使用以下块内容：
+
+```text
+请将以下完整内容转发到 Builder 会话：
+
 【背景】
 【任务】
 【边界】
 【成功标准】
+【验证要求】
 【禁止事项】
+【完成报告格式：必须是一个完整、连续、可一次复制转发给 Architect 的报告块】
 ```
 
 If no implementation should happen, end with / 如果不应实现，以此结尾：

@@ -60,3 +60,9 @@ User -> Architect -> Builder -> User
 ## 5. Stable Rule / 稳定规则
 
 Do not add new roles, workflows, or documents unless there is a repeated real problem. / 除非出现重复的真实问题，否则不要新增角色、流程或文档。
+
+When Architect gives a task to forward, copy only the complete forwardable instruction block. / 当 Architect 给出可转发任务指令时，只复制完整的可转发指令块。
+
+When Builder asks User to forward content to Architect, Codex, or Reviewer, copy only the complete forwardable output block. / 当 Builder 要求 User 转发内容给 Architect、Codex 或 Reviewer 时，只复制完整的可转发输出块。
+
+Builder completion reports should also be written as one complete block when they will be reviewed by Architect. / Builder 完成报告如果要交给 Architect 审查，也应写成一个完整块。

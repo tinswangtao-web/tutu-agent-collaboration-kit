@@ -1,7 +1,7 @@
 # Tutu Agent Collaboration Kit
 
 Status: Stable
-Version: v3.0.0
+Version: v3.0.3
 
 A minimal AI collaboration framework for personal software projects.
 一个面向个人软件项目的极简 AI 协作框架。

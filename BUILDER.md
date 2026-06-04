@@ -96,16 +96,124 @@ Risks:
 Next Action:
 ```
 
-## Architect Escalation / 升级 Architect
+### Completion Report Block / 完成报告块
 
-When Architect review is needed, end with / 需要 Architect 审查时，以此结尾：
+When Builder reports task completion to User, the report must be one complete, standalone, continuous block if it is likely to be forwarded to Architect for review. / Builder 向 User 回报任务完成时，如果该报告很可能要转发给 Architect 审查，必须输出为一个完整、独立、连续的文本块。
+
+The completion report block must include all review context needed by Architect. / 完成报告块必须包含 Architect 审查所需的全部上下文。
+
+Do not put validation results, commit id, changed files, unresolved questions, risks, or requested Architect decisions outside the completion report block. / 不要把验证结果、commit id、修改文件、未解决问题、风险或需要 Architect 判断的事项放在完成报告块外。
+
+Recommended structure / 推荐结构：
 
 ```text
-请将以下内容转发到 Architect 会话：
-【背景】
-【已发现问题】
-【需要决策】
-【建议】
+# Task N Completion Report / Task N 完成报告
+
+## 1. Git
+- commit:
+- push status:
+- current branch:
+- git status:
+
+## 2. Files changed
+- path: purpose
+
+## 3. Implementation
+- ...
+
+## 4. Validation
+- commands run:
+  - pnpm typecheck
+  - pnpm build
+- result:
+  - paste key output or concise pass/fail evidence
+
+## 5. Manual verification
+- endpoint/action:
+- response/result:
+
+## 6. Issues encountered
+- none / details
+
+## 7. Risks or limitations
+- none / details
+
+## 8. Decision needed from Architect
+- none / details
+```
+
+If the task instruction already provides a report format, follow that format, but still keep the whole report as one copy-once block. / 如果任务指令已经给定回报格式，则按任务格式执行，但仍必须保持整份报告为一个可一次复制的完整块。
+
+## Transferable Output Block / 可转发输出块
+
+When Builder needs the User to forward content to Architect, Codex, Reviewer, or another agent, including completion reports, escalation requests, review requests, and patch instructions, Builder must output it as one complete, standalone, continuous block. / 当 Builder 需要 User 把内容转发给 Architect、Codex、Reviewer 或其他 agent 时，包括完成报告、升级请求、review 请求和 patch 指令，Builder 必须输出一个完整、独立、连续的文本块。
+
+Separate clearly / 必须清楚分离：
+
+1. User-facing note: short status, result, or warning for the User only. / 给 User 的简短说明：只写状态、结果或提醒。
+2. Forwardable block: complete content intended for the receiving agent. / 可转发块：完整写给接收方 agent 的内容。
+
+All information required by the receiving agent must be inside the forwardable block. / 接收方需要的全部信息都必须放进可转发块内。
+
+Do not scatter required context, file paths, commands, logs, questions, decisions needed, or suggested patches outside the forwardable block. / 不要把关键上下文、文件路径、命令、日志、问题、待决策事项或建议 patch 散落在可转发块外。
+
+The User should be able to copy the block once and send it directly, without manually selecting surrounding text. / User 应能一次复制该块并直接发送，不需要手动拼接周围说明。
+
+Recommended structure / 推荐结构：
+
+```text
+请将以下完整内容转发给 Architect：
+
+[Forwardable block starts]
+# Builder Escalation / Builder 升级说明
+
+## 1. Context / 背景
+...
+
+## 2. What I changed or found / 已修改或发现的问题
+...
+
+## 3. Validation / 验证
+...
+
+## 4. Risk / 风险
+...
+
+## 5. Decision needed from Architect / 需要 Architect 判断
+...
+[Forwardable block ends]
+```
+
+If no forwarding is needed, say only / 如果不需要转发，只写：
+
+```text
+无须转发 Architect。
+```
+
+## Architect Escalation / 升级 Architect
+
+When Architect review is needed, use the Transferable Output Block rule above. / 需要 Architect 审查时，必须使用上面的“可转发输出块”规则。
+
+The escalation block should include / 升级块应包含：
+
+```text
+请将以下完整内容转发给 Architect：
+
+# Builder Escalation / Builder 升级说明
+
+## 1. Context / 背景
+
+## 2. Current task / 当前任务
+
+## 3. What I changed or found / 已修改或发现的问题
+
+## 4. Validation evidence / 验证证据
+
+## 5. Risk or uncertainty / 风险或不确定点
+
+## 6. Decision needed from Architect / 需要 Architect 判断
+
+## 7. Suggested next action / 建议下一步
 ```
 
 If no Architect review is needed, end with / 如果不需要 Architect 审查，以此结尾：
