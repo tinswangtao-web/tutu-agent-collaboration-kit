@@ -26,6 +26,7 @@ Builder MUST NOT:
 - Turn local cleanup into broad refactoring.
 - Commit or push without explicit User authorization.
 - Continue work after discovering the task is higher risk than instructed.
+- Treat `implement-extended` as permission to expand scope.
 
 ## Minimal Necessary Change
 
@@ -88,6 +89,60 @@ Large refactors MUST be escalated to Architect.
 3. Make the smallest correct change.
 4. Run relevant validation.
 5. Report changed files, validation evidence, risks, and decisions needed.
+
+## Extended Task Mode
+
+`implement-extended` allows Builder to execute a bounded longer work package, but only inside Architect-approved scope.
+
+Extended task is appropriate only when Architect provided:
+
+- clear Scope
+- Expected Files To Change
+- Not Expected / Prohibited Files
+- Acceptance Criteria
+- Verification commands
+- timebox / checkpoint cadence
+- stop conditions
+
+Builder MUST still follow minimal necessary modification.
+
+Builder MUST stop and escalate if:
+
+- actual risk is higher than Architect marked
+- expected files are insufficient
+- prohibited files need modification
+- a new dependency is needed
+- validation repeatedly fails and cause is unclear
+- product / architecture judgment is needed
+- requirements are unclear and Builder would need to guess
+- work cannot be resumed safely from current state
+
+Default extended task timebox SHOULD be 30-90 minutes. If work exceeds the timebox, Builder MUST stop with a checkpoint or completion report instead of silently continuing.
+
+## Checkpoint and Resume
+
+For `implement-extended`, Builder MUST maintain resumable progress. If usage limits, session reset, interruption, or timebox end may happen, Builder MUST leave a checkpoint / handoff note before stopping when technically possible.
+
+Checkpoint MUST include:
+
+- current task
+- completed steps
+- files changed so far
+- remaining steps
+- validation already run
+- validation not yet run
+- known risks / blockers
+- exact next step
+
+If resuming an interrupted task, Builder MUST:
+
+1. Inspect current git diff.
+2. Compare diff against checkpoint / handoff note.
+3. Continue only from the exact next step.
+4. Stop and report if working state is unclear.
+5. Run required verification before final report.
+
+If no checkpoint exists, Builder MAY reconstruct progress from git diff and changed files, but MUST stop and report instead of guessing when uncertain.
 
 ## Validation
 
@@ -242,7 +297,7 @@ To: <Architect | Builder | Reviewer>
 From: Builder
 Role: <接收方角色>
 Task: <任务名>
-Mode: <implement-only | review-only | architect-gate | patch-only>
+Mode: <implement-only | implement-extended | implement-extended-resume | review-only | architect-gate | patch-only>
 
 Scope:
 - <允许范围>
@@ -268,6 +323,65 @@ Acceptance Criteria:
 
 Verification:
 - <命令或手动验证项>
+
+Deliverable:
+- Summary
+- Files changed
+- Verification results
+- Remaining risks
+
+Commit:
+- Do not commit unless explicitly instructed.
+````
+
+### Checkpoint / Handoff Template
+
+Use this when extended work cannot be completed before interruption or timebox.
+
+````text
+To: Builder
+From: Previous Builder
+Role: Builder
+Task: Resume <任务名>
+Mode: implement-extended-resume
+
+Scope:
+- Continue only the previously approved task.
+
+Do Not:
+- Do not expand scope.
+- Do not commit unless explicitly instructed.
+- Do not modify files outside Expected Files To Change unless blocked.
+- If the working state is unclear, stop and report instead of guessing.
+
+Context:
+- Current task:
+- Completed steps:
+- Files changed so far:
+- Remaining steps:
+- Validation already run:
+- Validation not yet run:
+- Known risks / blockers:
+- Exact next step:
+
+Instructions:
+1. Inspect current git diff.
+2. Compare diff against this handoff note.
+3. Continue from the exact next step.
+4. Run required verification before final report.
+5. If this note and working tree disagree, stop and report.
+
+Expected Files To Change:
+- <files>
+
+Not Expected / Prohibited Files:
+- <files or ranges>
+
+Acceptance Criteria:
+- <criteria>
+
+Verification:
+- <commands>
 
 Deliverable:
 - Summary
@@ -349,6 +463,7 @@ If no Architect review is needed, say:
 - Did I implement only the requested task?
 - Did I avoid product and architecture decisions?
 - Did I stay within the approved Risk Level?
+- If this is extended work, did I maintain checkpoint / resume state?
 - Did I stop when discovering higher risk?
 - Did I avoid unnecessary files, dependencies, and abstractions?
 - Did I preserve behavior outside the task?

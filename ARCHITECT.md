@@ -16,6 +16,7 @@ Architect owns:
 - Value / Cost decision
 - Architecture direction
 - Task Risk Level
+- Task Granularity and Builder Mode
 - Success Criteria
 - Whether Builder / Reviewer is needed
 - Reviewer capability requirements when Reviewer is needed
@@ -184,6 +185,61 @@ Architect → final approval
 | Level 3 High-risk | Standard / Deep | Recommended when confidence is insufficient |
 | Level 4 Critical | Deep | Strongly recommended / required when Architect lacks direct evidence |
 
+## Task Granularity and Builder Mode
+
+User MAY request preferred task granularity:
+
+- `short task`
+- `extended task`
+- `Architect decides`
+
+Architect MUST treat this as User preference, not automatic approval.
+
+Architect MUST choose final Builder mode based on:
+
+- Scope clarity
+- Task Risk Level
+- Expected / prohibited files clarity
+- Verification clarity
+- Need for product / architecture judgment
+- Resume safety
+
+Use short task when:
+
+- Scope is unclear.
+- Risk is Level 3 with uncertainty, or Level 4.
+- Expected files cannot be listed.
+- Verification cannot be named.
+- Task requires product / architecture judgment.
+- User needs quick confirmation before more work.
+
+Use extended task when:
+
+- Scope is clear.
+- Risk is Level 1 or Level 2.
+- Expected and prohibited files can be listed.
+- Acceptance criteria are concrete.
+- Verification commands are known.
+- Work can be split into resumable checkpoints.
+- Builder can continue without making new product / architecture decisions.
+
+Level 3 MAY use `implement-extended` only when scope is narrow, risk is understood, checkpoint cadence is explicit, and Architect can tolerate a longer working state before review.
+
+Level 4 MUST NOT use `implement-extended`; split into short gated tasks with review points.
+
+If User prefers extended task but risk or uncertainty is too high, Architect MUST explain why and issue a shorter gated task instead.
+
+If User prefers short task, Architect SHOULD keep the Builder task narrow even if a longer task is technically possible.
+
+### Builder Modes
+
+- `implement-only`：short implementation task, usually 5-20 minutes.
+- `implement-extended`：bounded longer task, usually 30-90 minutes, with checkpoint / resume requirements.
+- `implement-extended-resume`：continue an interrupted approved extended task from checkpoint or reconstructed diff.
+- `patch-only`：apply an explicit patch or narrow edit only.
+- `review-only`：inspection without modification.
+- `architect-gate`：decision / escalation / review gate, no implementation.
+
 ## Reviewer Usage
 
 Reviewer is an optional independent verification role.
@@ -282,6 +338,14 @@ Builder task instructions MUST also include:
 - Verification commands.
 - Required Builder return fields: summary, files changed, verification results, remaining risks.
 
+Extended Builder task instructions MUST also include:
+
+- Timebox / checkpoint cadence.
+- Resume safety requirement.
+- Stop conditions.
+- Checkpoint fields.
+- Exact resume instruction when continuing interrupted work.
+
 ### Minimum Forwarding Template
 
 ````text
@@ -289,7 +353,7 @@ To: <Architect | Builder | Reviewer>
 From: <User | Architect | Reviewer>
 Role: <接收方角色>
 Task: <任务名>
-Mode: <implement-only | review-only | architect-gate | patch-only>
+Mode: <implement-only | implement-extended | implement-extended-resume | review-only | architect-gate | patch-only>
 
 Scope:
 - <允许范围>
@@ -333,7 +397,7 @@ To: Builder
 From: Architect
 Role: Builder
 Task: <任务名>
-Mode: implement-only
+Mode: <implement-only | implement-extended>
 
 Scope:
 - <允许范围>
@@ -352,6 +416,9 @@ Context:
 - Cost:
 - Decision: DO NOW
 - Task Risk Level: Level 1 / Level 2 / Level 3 / Level 4
+- User Granularity Preference: short task / extended task / Architect decides
+- Builder Mode Rationale:
+- Timebox / Checkpoint Cadence: <required for implement-extended, otherwise N/A>
 - <必要背景>
 
 Instructions:
@@ -369,6 +436,75 @@ Acceptance Criteria:
 
 Verification:
 - <verification commands>
+
+Checkpoint / Resume:
+- Required: yes / no
+- Checkpoint fields: current task, completed steps, files changed so far, remaining steps, validation run, validation pending, known risks / blockers, exact next step
+- If interrupted: inspect git diff, compare with checkpoint, continue only from exact next step, and stop if working state is unclear.
+
+Stop Conditions:
+- Stop and report if risk increases, expected files are insufficient, prohibited files need modification, new dependency is needed, validation repeatedly fails with unclear cause, product / architecture judgment is needed, requirements are unclear, or work cannot be resumed safely.
+
+Deliverable:
+- Summary
+- Files changed
+- Verification results
+- Remaining risks
+
+Commit:
+- Do not commit unless explicitly instructed.
+````
+
+### Architect → Builder Resume Instruction
+
+````text
+To: Builder
+From: Architect
+Role: Builder
+Task: Resume <任务名>
+Mode: implement-extended-resume
+
+Scope:
+- Continue only the previously approved task from checkpoint or reconstructed git diff.
+
+Do Not:
+- Do not commit unless explicitly instructed.
+- Do not expand scope.
+- Do not modify files outside Expected Files To Change unless blocked.
+- If the working state is unclear, stop and report instead of guessing.
+
+Context:
+- Original task:
+- Previous Builder checkpoint / handoff:
+- Completed:
+- In progress:
+- Files changed so far:
+- Validation run:
+- Validation pending:
+- Known risks / blockers:
+- Exact next step:
+
+Instructions:
+1. Inspect current git diff.
+2. Compare the diff against checkpoint / handoff.
+3. Continue from the exact next step only.
+4. Run required verification before final report.
+5. If checkpoint and working tree disagree, stop and report.
+
+Expected Files To Change:
+- <files>
+
+Not Expected / Prohibited Files:
+- <files or ranges>
+
+Acceptance Criteria:
+- <criteria>
+
+Verification:
+- <commands>
+
+Checkpoint / Resume:
+- Maintain updated checkpoint if the task cannot be completed in this session.
 
 Deliverable:
 - Summary
@@ -453,14 +589,19 @@ Remote Architect Mode / Repo-aware Architect Mode
 
 ## 5. Task Risk Level
 
-## 6. Review Support
+## 6. Task Granularity / Builder Mode
+- User preference: short task / extended task / Architect decides
+- Final Builder Mode: implement-only / implement-extended / implement-extended-resume / patch-only / N/A
+- Rationale:
+
+## 7. Review Support
 - Reviewer: needed / optional / not needed
 - Required Reviewer capability:
 
-## 7. Decision
+## 8. Decision
 DO NOW / POSTPONE / REJECT
 
-## 8. Transferable Block
+## 9. Transferable Block
 [only if needed]
 ```
 
@@ -472,6 +613,7 @@ DO NOW / POSTPONE / REJECT
 - Did I evaluate Priority?
 - Did I evaluate Value / Cost?
 - Did I classify Task Risk Level?
+- Did I decide short vs extended task based on risk, clarity, and resume safety?
 - Did I decide whether Reviewer is needed based on capability, risk, confidence, and User constraints?
 - Did I avoid sending OUT / NEVER work to Builder?
 - Did I keep the Builder instruction complete and copy-once usable?

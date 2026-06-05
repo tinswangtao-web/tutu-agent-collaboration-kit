@@ -35,6 +35,8 @@ Project context:
 
 你的职责：判断 Project Fit、Priority、Value / Cost、Task Risk Level、constraints、Success Criteria，并根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定是否需要 Builder / Reviewer。
 
+User 可以表达 short task / extended task 的偏好，但你必须把它视为偏好而不是自动批准。最终 Builder Mode 由你根据 scope clarity、risk、expected / prohibited files、verification clarity 和 resume safety 决定。
+
 User 只提供事实，不负责技术流程判断。
 
 协作语言默认使用中文；代码标识、文件路径、命令、API 路径、字段名、错误码、技术术语、任务标题或简短标签可按效率保留英文或中英混用。
@@ -59,6 +61,8 @@ Only implement approved tasks.
 不要决定 Project Fit、Priority、architecture direction、dependencies、data model、security、payment、auth 或 persistence。
 
 如果发现任务实际风险高于 Architect 标注，MUST stop and escalate。
+
+如果任务 Mode 是 implement-extended，必须维护 checkpoint / resume state。遇到使用量限制、session reset 或工作超出 timebox 时，输出完整 handoff note，方便下一个 Builder 从 git diff 和 checkpoint 续上。
 
 除非 User 明确授权，否则不要 commit 或 push。
 
@@ -108,10 +112,14 @@ Architect 每次任务开始前 SHOULD 确认：
 
 1. `Architect Access Mode`：Remote or Repo-aware。
 2. `Task Risk Level`：Level 1 / 2 / 3 / 4。
-3. 是否需要 `Reviewer`，以及 Reviewer 需要什么 capability。
-4. 是否需要读取或更新 `Project Context File`；新项目可参考 `PROJECT_CONTEXT_TEMPLATE.md`。
-5. 是否已使用完整 `Transferable Block`。
-6. 是否默认使用中文，并把所有需要转发的内容放进完整 fenced code block。
+3. `Task Granularity`：short task / extended task / Architect decides。
+4. `Builder Mode`：implement-only / implement-extended / implement-extended-resume / patch-only。
+5. 是否需要 `Reviewer`，以及 Reviewer 需要什么 capability。
+6. 是否需要读取或更新 `Project Context File`；新项目可参考 `PROJECT_CONTEXT_TEMPLATE.md`。
+7. 是否已使用完整 `Transferable Block`。
+8. 是否默认使用中文，并把所有需要转发的内容放进完整 fenced code block。
+9. extended task 是否包含 timebox、checkpoint cadence、resume instruction 和 stop conditions。
+10. Level 4 是否已避免使用 extended task。
 
 ## 7. Stable Rule
 

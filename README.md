@@ -1,7 +1,7 @@
 # Tutu Agent Collaboration Kit
 
 Status: Stable
-Version: v3.1.3
+Version: v3.1.4
 
 一个面向个人软件项目的轻量 AI 协作规则。目标是让不懂代码的 Project Owner 也能稳定协调多个可替换 AI 进行长期开发。
 
@@ -65,6 +65,46 @@ Architect MUST 在 handoff 前判断任务风险等级，并根据 Access Mode�
 | Level 3 High-risk | multi-file business logic / core flow | Recommended when Architect lacks repo confidence |
 | Level 4 Critical | schema / migration / auth / permission / ledger / security / production data risk | Strongly recommended / required when Architect lacks repo confidence |
 
+### Task Granularity
+
+User MAY request preferred task granularity:
+
+- `short task`：先快速验证方向，减少不确定性。
+- `extended task`：让 Builder 连续执行一个完整工作包，提高效率。
+- `Architect decides`：由 Architect 按风险和清晰度决定。
+
+Architect MUST treat User granularity as preference, not automatic approval.
+
+Use short task when:
+
+- Scope is unclear.
+- Risk is Level 3 with uncertainty, or Level 4.
+- Expected files cannot be listed.
+- Verification cannot be named.
+- Task requires product / architecture judgment.
+- User needs quick confirmation before more work.
+
+Use extended task when:
+
+- Scope is clear.
+- Risk is Level 1 or Level 2.
+- Expected and prohibited files can be listed.
+- Acceptance criteria are concrete.
+- Verification commands are known.
+- Work can be split into resumable checkpoints.
+- Builder can continue without making new product / architecture decisions.
+
+Extended task is for batching already-decided work. Short task is for reducing uncertainty.
+
+Builder modes include:
+
+- `implement-only`
+- `implement-extended`
+- `implement-extended-resume`
+- `patch-only`
+- `review-only`
+- `architect-gate`
+
 ## Project Context File
 
 长期项目 MAY 维护短小状态快照，例如：
@@ -110,7 +150,7 @@ To: <Architect | Builder | Reviewer>
 From: <User | Architect | Reviewer>
 Role: <接收方角色>
 Task: <任务名>
-Mode: <implement-only | review-only | architect-gate | patch-only>
+Mode: <implement-only | implement-extended | implement-extended-resume | review-only | architect-gate | patch-only>
 
 Scope:
 - <允许范围>
@@ -159,6 +199,14 @@ Commit:
 - Not expected / prohibited files。
 - Verification commands。
 - Builder 必须返回 summary、files changed、verification results、remaining risks。
+
+给 Builder 的 extended task 还 MUST 明确：
+
+- Timebox / checkpoint cadence，例如 30-90 minutes，或每 20-40 minutes 形成 checkpoint。
+- Resume safety：中断后必须能通过 git diff、checkpoint、handoff note 续上。
+- Stop conditions：风险升高、expected files 不够、需要改 prohibited files、需要新增 dependency、连续验证失败、需要猜需求时停下报告。
+- Checkpoint fields：current task、completed steps、files changed so far、remaining steps、validation run、validation pending、known risks / blockers、exact next step。
+- Level 4 MUST NOT use extended task。
 
 ---
 
