@@ -32,6 +32,11 @@
 - Module / API / data model note 1:
 - Module / API / data model note 2:
 
+## Design Alignment Notes
+
+- Latest alignment review:
+- Accepted design direction changes:
+
 ## Known Risks / TODO
 
 - Risk / TODO 1:
@@ -52,6 +57,7 @@
 
 ## Session Handoff Rule
 
-- After each independent Task is DONE, prefer starting a new Architect session and a new Builder session.
+- After each Task is DONE, Architect decides whether to continue current sessions, recommend fresh sessions, or require fresh sessions.
+- Prefer fresh sessions for high-risk, long, overnight, phase-boundary, complex resume, or context-polluted work.
 - New Architect restores state from this file and waits for the user's next-stage goal.
 - New Builder restores state from this file and waits for an approved Task Card.

@@ -35,7 +35,7 @@ Project context:
 
 历史聊天记录只作为临时缓存；如果存在 AI_CONTEXT.md，项目当前状态以 AI_CONTEXT.md 为准。
 
-你的职责：判断 Project Fit、Priority、Value / Cost、Task Risk Level、constraints、Success Criteria，并根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定是否需要 Builder / Reviewer。
+你的职责：判断 Project Fit、Priority、Value / Cost、Task Risk Level、constraints、Success Criteria，并根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定是否需要 Builder / Reviewer。阶段结束、多个相关任务完成、long / overnight task 后，或发现方向可能偏离时，执行轻量 Design Alignment Review。
 
 User 可以表达 short task / extended task / overnight task（过夜任务）的偏好，但你必须把它视为偏好而不是自动批准。最终 Builder Mode 由你根据 scope clarity、risk、expected / prohibited files、verification clarity 和 resume safety 决定。
 
@@ -49,7 +49,9 @@ User 只提供事实，不负责技术流程判断。
 
 不要实现代码。
 
-如果你判定一个独立 Task 已经 DONE，必须执行 Task Close Review，确认或要求更新 AI_CONTEXT.md，并输出 Next Architect Session Starter 与 Next Builder Session Starter。旧 Architect 只负责 handoff，不直接规划下一个正式 Task，除非 User 明确提出下一步需求。
+如果你判定一个 Task 已经 DONE，必须执行 Task Close Review，并判断是否继续当前会话、建议新会话或要求新会话。只有在建议或要求新会话时，才必须输出 Next Architect Session Starter 与 Next Builder Session Starter。旧 Architect 不直接规划下一个正式 Task，除非 User 明确提出下一步需求。
+
+上下文是否明显变脏由 Architect 最终判断。Builder 只能 flag / 建议，User 可以主动要求新会话，但 User 不负责技术判断。
 ```
 
 ## 3. Start Builder
@@ -71,6 +73,10 @@ Only implement approved tasks.
 如果发现任务实际风险高于 Architect 标注，MUST stop and escalate。
 
 如果任务 Mode 是 implement-extended 或 overnight-extended，必须维护 checkpoint / resume state。遇到使用量限制、session reset、工作超出 timebox / unattended duration、队列完成或 stop condition 时，输出完整 handoff note 或 completion report，方便 Architect 第二天 review。
+
+如果你发现 Task Card、当前批准范围、git diff、验证状态或聊天上下文变得不清楚，必须在 report 中加入 context pollution flag，建议 Architect 判断是否需要新会话；不要自行规划下一任务或自行重置流程。
+
+如果你发现实现方向可能偏离 PROJECT_DESIGN.md、AI_CONTEXT.md、README 或用户明确目标，必须在 report 中加入 design drift flag；不要自行接受新方向、重写设计或扩大实现。
 
 除非 User 明确授权，否则不要 commit 或 push。
 
@@ -114,10 +120,10 @@ User → Architect → Builder → Architect review → User
 User → Architect → Builder → Reviewer → Architect → User
 ```
 
-每个独立 Task 完成后，推荐开启新的 Architect 会话和新的 Builder 会话：
+低风险小任务可以继续当前会话。独立阶段、高风险任务、长任务、过夜任务、复杂 resume 或上下文明显变脏时，推荐或要求开启新的 Architect 会话和新的 Builder 会话：
 
 ```text
-Old Architect closes Task → AI_CONTEXT.md current → New Architect waits for next goal → New Builder waits for Task Card
+Architect closes Task → session decision → continue current session OR fresh Architect / Builder sessions
 ```
 
 ## 6. Session Checklist
@@ -135,7 +141,9 @@ Architect 每次任务开始或关闭时 SHOULD 确认：
 9. extended task 是否包含 timebox、checkpoint cadence、resume instruction 和 stop conditions。
 10. Level 4 是否已避免使用 extended task / overnight task。
 11. overnight task 是否包含有限 task queue、每项 acceptance / verification、最大无人值守时长、morning review instruction。
-12. Task close 时是否完成 Task Close Review、AI_CONTEXT.md update requirement、Next Architect Session Starter、Next Builder Session Starter。
+12. Task close 时是否完成 Task Close Review、AI_CONTEXT.md update requirement、session decision。
+13. 如果建议或要求新会话，是否输出 Next Architect Session Starter、Next Builder Session Starter。
+14. 是否需要 Design Alignment Review；尤其是多个相关任务后、阶段边界、long / overnight task 后、Builder flag drift 后。
 
 ## 7. Stable Rule
 

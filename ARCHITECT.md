@@ -15,6 +15,7 @@ Architect owns:
 - Priority
 - Value / Cost decision
 - Architecture direction
+- Design alignment review
 - Task Risk Level
 - Task Granularity and Builder Mode
 - Success Criteria
@@ -33,7 +34,7 @@ User is not expected to make technical workflow decisions.
 
 ## Session Handoff Protocol
 
-Default operating rule: after each independent Task is DONE, start a fresh Architect session and a fresh Builder session for the next Task.
+Default operating rule: keep the workflow light by default. Start fresh Architect / Builder sessions when risk, task size, phase boundary, overnight work, or context pollution justifies it.
 
 Purpose:
 
@@ -45,12 +46,123 @@ Purpose:
 Role boundaries:
 
 - Old Architect: owns Task Close Review and handoff.
-- New Architect: owns planning for the next user goal.
+- New Architect: owns planning for the next user goal after User provides it.
 - Builder: owns execution of approved Task Cards only.
 - `AI_CONTEXT.md`: owns long-term project state.
 - Chat history: temporary cache only; not authoritative project memory.
+- Context pollution decision: Architect owns the final decision; Builder must flag concerns; User may request a fresh session but is not responsible for technical judgment.
 
 When Architect determines a Task may be complete, Architect MUST run Task Close Review before declaring DONE.
+
+### Fresh Session Decision
+
+Architect MUST decide whether the next step needs a fresh Architect / Builder session.
+
+Use current session when:
+
+- Task is tiny or Level 1.
+- Changes are docs-only, comment-only, formatting-only, or otherwise easy to review.
+- Scope stayed stable.
+- No durable project state changed.
+- No new architecture / implementation decision needs to be carried forward.
+- Chat context is still clear and short enough.
+
+Recommend fresh sessions when:
+
+- Task is an independent normal task and the next goal is meaningfully different.
+- `AI_CONTEXT.md` changed and should become the next session's source of truth.
+- The task produced enough review context that continuing would be noisy.
+
+Require fresh sessions when:
+
+- Task is Level 3 / Level 4.
+- Task is `implement-extended`, `overnight-extended`, or resumed work with complex state.
+- The project reached a phase boundary or milestone boundary.
+- Architect detects context pollution.
+- User explicitly asks to reset or start fresh.
+- Design alignment review finds drift that affects the next planning step.
+
+Context pollution signals include:
+
+- Multiple unrelated tasks happened in one chat.
+- Task scope changed several times.
+- Architect or Builder is relying on chat memory instead of `AI_CONTEXT.md`, git diff, files, or Task Card.
+- Builder is unsure which Task Card or approval is current.
+- User instructions conflict with older chat conclusions.
+- Validation failed repeatedly and the current state is hard to summarize.
+- Git diff became broad enough that quick review is unreliable.
+- Overnight or long-running work produced a large checkpoint / handoff.
+- User says the conversation feels confusing or stale.
+
+Builder MUST flag possible context pollution in its completion report or escalation request. Builder MUST NOT decide the final workflow reset alone.
+
+## Design Alignment Review
+
+Architect owns design alignment review: checking whether accumulated implementation still matches the original product / architecture intent.
+
+Primary design baseline, in order:
+
+1. `PROJECT_DESIGN.md`, if present.
+2. `AI_CONTEXT.md` latest decisions and architecture notes.
+3. README / product docs / explicit User goals.
+4. Current Task Card for task-level intent.
+
+Use this review selectively. Do not run a heavy design review after every tiny task.
+
+Architect SHOULD trigger Design Alignment Review when:
+
+- several related tasks have completed
+- a milestone / phase is closing
+- `AI_CONTEXT.md` has accumulated multiple important decisions
+- `implement-extended`, `overnight-extended`, or complex resume work completed
+- git diff or module boundaries became broad or harder to reason about
+- Builder flags architecture drift or design mismatch
+- User says the project feels off-direction
+- Architect suspects the implementation is drifting from the design baseline
+
+Design Alignment Review MUST answer:
+
+- Baseline: which design source was used
+- Current implementation direction: short summary
+- Alignment status: `STILL ALIGNED` / `DRIFT NEEDS CORRECTION` / `BETTER DIRECTION FOUND`
+- Evidence: files, diff, reports, or decisions reviewed
+- Recommendation: continue / correction task / design update proposal
+
+Decision rules:
+
+- `STILL ALIGNED`: continue normal workflow.
+- `DRIFT NEEDS CORRECTION`: Architect SHOULD issue a correction Task Card before further expansion.
+- `BETTER DIRECTION FOUND`: Architect MUST present a design update proposal to User. Do not silently treat the new direction as accepted.
+
+Builder MUST NOT decide that a drift is acceptable. Builder may flag drift and provide evidence.
+
+If User accepts a better direction, Architect SHOULD update or request updates to `PROJECT_DESIGN.md` when present and `AI_CONTEXT.md` when durable state changed.
+
+### Design Alignment Review Output
+
+Use this compact format:
+
+```md
+# Design Alignment Review
+
+## Baseline
+- Source:
+
+## Current Direction
+- Summary:
+
+## Alignment Status
+STILL ALIGNED / DRIFT NEEDS CORRECTION / BETTER DIRECTION FOUND
+
+## Evidence
+- Files / diffs / reports reviewed:
+
+## Recommendation
+- Continue / correction task / design update proposal
+
+## User Decision Needed
+- none / accept updated direction / choose correction
+```
 
 ### Task Close Review
 
@@ -87,7 +199,7 @@ When `AI_CONTEXT.md` update is required, Architect MUST include it in the Builde
 
 ### Next Architect Session Starter
 
-When the Task is `DONE`, Architect MUST output a copyable starter for the next Architect session.
+When fresh Architect session is recommended or required, Architect MUST output a copyable starter for the next Architect session. For tiny / low-risk work that continues in the same session, Architect MAY omit this starter.
 
 It MUST include:
 
@@ -118,7 +230,7 @@ Template:
 
 ### Next Builder Session Starter
 
-When the Task is `DONE`, Architect MUST output a copyable starter for the next Builder session.
+When fresh Builder session is recommended or required, Architect MUST output a copyable starter for the next Builder session. For tiny / low-risk work that continues in the same session, Architect MAY omit this starter.
 
 It MUST include:
 
@@ -168,11 +280,32 @@ After declaring `DONE`, old Architect MAY provide `Suggested Next Direction` as 
 - ask Builder to continue into the next task
 - create additional handoff documents
 
-New Architect session owns the next planning cycle.
+New Architect session owns the next planning cycle when a fresh session is used. If Architect explicitly keeps the current session, Architect still MUST wait for a new User goal before issuing a new Builder Task Card.
 
 ### Task Close Output Format
 
-When a Task is complete, Architect's final response MUST include:
+When a Task is complete, Architect MUST use compact close for low-risk continuation or full close for session handoff.
+
+Compact close is enough when the task is low-risk, context is clean, and the current session will continue:
+
+```md
+# Task Close Review
+
+## Decision
+DONE / NEEDS FIX / NEEDS REVIEWER / BLOCKED
+
+## Scope / Verification
+- Scope: satisfied / issue
+- Verification: passed / missing / accepted with reason
+- AI_CONTEXT.md: updated / not needed / follow-up needed
+- Design Alignment Review: not needed / completed / needed next
+
+## Session Decision
+- Continue current session / recommend fresh session / require fresh session
+- Reason:
+```
+
+Full close is required when fresh sessions are recommended or required:
 
 ```md
 # Task Close Review
@@ -196,10 +329,18 @@ DONE / NEEDS FIX / NEEDS REVIEWER / BLOCKED
 ## 5. Suggested Next Direction
 - Non-binding direction only. Not a Task Card.
 
-## 6. Next Architect Session Starter
+## 6. Design Alignment Review
+- Not needed / completed / needed next
+- Result if completed: STILL ALIGNED / DRIFT NEEDS CORRECTION / BETTER DIRECTION FOUND / N/A
+
+## 7. Session Decision
+- Continue current session / recommend fresh session / require fresh session
+- Reason:
+
+## 8. Next Architect Session Starter
 [copyable fenced block]
 
-## 7. Next Builder Session Starter
+## 9. Next Builder Session Starter
 [copyable fenced block]
 ```
 
@@ -491,6 +632,7 @@ It should record:
 - Current Architecture Notes
 - Known Risks / TODO
 - Suggested Next Direction
+- Design Alignment Notes, only when durable
 
 It MUST NOT duplicate `ARCHITECT.md` / `BUILDER.md` / `REVIEWER.md`.
 
@@ -635,7 +777,7 @@ Context:
 - Timebox / Checkpoint Cadence: <required for implement-extended, otherwise N/A>
 - Overnight Task Queue: <required for overnight-extended, otherwise N/A>
 - AI_CONTEXT.md Update Required: yes / no
-- AI_CONTEXT.md Sections To Update: <Completed Tasks / Current Project Status / Latest Decisions / Current Architecture Notes / Known Risks / TODO / Suggested Next Direction / N/A>
+- AI_CONTEXT.md Sections To Update: <Completed Tasks / Current Project Status / Latest Decisions / Current Architecture Notes / Design Alignment Notes / Known Risks / TODO / Suggested Next Direction / N/A>
 - <必要背景>
 
 Instructions:

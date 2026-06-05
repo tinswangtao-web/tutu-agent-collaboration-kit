@@ -61,6 +61,7 @@ If Builder discovers the task involves any unapproved higher-risk area, MUST sto
 - more files or modules than expected
 - task boundary expansion
 - architecture drift
+- design baseline mismatch
 
 Escalation MUST be one complete transferable block for Architect.
 
@@ -97,6 +98,49 @@ Large refactors MUST be escalated to Architect.
 New Builder sessions MUST NOT design, plan, or modify files before receiving an approved Task Card.
 
 `AI_CONTEXT.md` is current-state memory, not task authorization. Builder MUST NOT treat `Suggested Next Direction` as approval to implement.
+
+## Context Pollution Flag
+
+Builder does not decide whether to reset sessions, but MUST flag possible context pollution to Architect when it affects execution or review.
+
+Flag possible context pollution when:
+
+- Builder is unsure which Task Card or approval is current.
+- Scope changed multiple times during the task.
+- The current diff became broad or hard to summarize.
+- Validation failed repeatedly and the cause is unclear.
+- The task was resumed, interrupted, or overnight-running and state is complex.
+- Instructions in chat conflict with `AI_CONTEXT.md`, current files, or the Task Card.
+
+When flagging, Builder should include:
+
+- what became unclear
+- affected files or scope
+- whether work can still be reviewed from git diff and report
+- whether Builder recommends Architect consider a fresh session
+
+Builder MUST NOT create a new plan, start a new task, or reset workflow by itself.
+
+## Design Drift Flag
+
+Builder MUST flag possible design or architecture drift to Architect instead of silently correcting or accepting it.
+
+Flag design drift when:
+
+- implementation needed by the Task Card conflicts with `PROJECT_DESIGN.md`, `AI_CONTEXT.md`, README, or explicit User goals
+- current code direction appears to differ from the approved product / architecture intent
+- a simpler or better design becomes obvious during implementation
+- completing the task safely would require changing product behavior, module boundaries, data model, or architecture direction
+
+When flagging, Builder should include:
+
+- baseline source checked, if available
+- what appears misaligned
+- whether this is harmful drift or a potentially better direction
+- files / code paths involved
+- recommended Architect decision needed
+
+Builder MUST NOT update `PROJECT_DESIGN.md`, change architecture direction, or implement the better direction unless Architect explicitly approves it in a Task Card.
 
 ## Extended Task Mode
 
@@ -279,6 +323,8 @@ Deliverable:
 - Verification results
 - Remaining risks
 - AI_CONTEXT.md updated: yes / no / not requested
+- Context pollution flag: none / details
+- Design drift flag: none / details
 
 Summary:
 - <what changed>
@@ -299,6 +345,12 @@ Remaining risks:
 
 AI_CONTEXT.md:
 - updated / not requested / blocked with reason
+
+Context pollution flag:
+- none / details
+
+Design drift flag:
+- none / details
 
 Decision needed from Architect:
 - none / details
@@ -516,11 +568,13 @@ If no Architect review is needed, say:
 
 - Did I implement only the requested task?
 - Did I avoid product and architecture decisions?
+- If implementation appeared to drift from design, did I flag it instead of deciding the new direction myself?
 - If this is a new session, did I wait for an approved Task Card before modifying files?
 - Did I stay within the approved Risk Level?
 - If this is extended work, did I maintain checkpoint / resume state?
 - If this is overnight work, did I execute only the approved queue and stop instead of inventing more work?
 - If Architect required `AI_CONTEXT.md` updates, did I keep them short and current-state oriented?
+- If context became unclear or polluted, did I flag it for Architect instead of deciding the reset myself?
 - Did I stop when discovering higher risk?
 - Did I avoid unnecessary files, dependencies, and abstractions?
 - Did I preserve behavior outside the task?

@@ -1,7 +1,7 @@
 # Tutu Agent Collaboration Kit
 
 Status: Stable
-Version: 3.2
+Version: 3.2.1
 
 一个面向个人软件项目的轻量 AI 协作规则。目标是让不懂代码的 Project Owner 也能稳定协调多个可替换 AI 进行长期开发。
 
@@ -11,10 +11,10 @@ Version: 3.2
 User → Architect → Builder → Architect review → User
 ```
 
-每个独立 Task 完成后，推荐开启新的 Architect 会话和新的 Builder 会话，以减少长会话上下文污染：
+低风险小任务可以继续当前会话。独立阶段、高风险任务、长任务、过夜任务、复杂 resume 或上下文明显变脏时，推荐或要求开启新的 Architect 会话和新的 Builder 会话：
 
 ```text
-Old Architect closes Task → AI_CONTEXT.md current → New Architect waits for user goal → New Builder waits for approved Task Card
+Architect closes Task → session decision → continue current session OR fresh Architect / Builder sessions
 ```
 
 当任务风险较高、Architect 无法直接读取 repo，或代码级证据不足时，Architect 可以按需启用 Reviewer：
@@ -27,7 +27,7 @@ User → Architect → Builder → Reviewer → Architect → User
 
 ```text
 默认轻流程；按能力和风险逐级加审查。
-每个 Task 完成后，用 AI_CONTEXT.md 交接长期状态。
+AI_CONTEXT.md 只记录长期状态变化；聊天记录只是临时缓存。
 ```
 
 ## Files
@@ -52,11 +52,37 @@ User → Architect → Builder → Reviewer → Architect → User
 
 ### Session handoff boundaries
 
-- Old Architect：Task Close Review、确认 `AI_CONTEXT.md` 更新、输出下一 Architect / Builder 会话启动词。
+- Old Architect：Task Close Review、确认 `AI_CONTEXT.md` 是否需要更新，并判断继续当前会话、建议新会话或要求新会话；只有新会话被建议或要求时才输出下一 Architect / Builder 会话启动词。
 - New Architect：先等待用户新的下一阶段目标，再进行 Planning 并生成新的 Task Card。
 - Builder：只执行 approved Task Card；新 Builder 会话读取规则和 `AI_CONTEXT.md` 后等待任务。
 - `AI_CONTEXT.md`：长期项目状态记忆。
 - Chat history：临时缓存，不作为长期项目记忆。
+- Context pollution：Architect 最终判断是否需要新会话；Builder 负责 flag；User 可以要求新会话但不负责技术判断。
+
+Fresh sessions are:
+
+- optional for tiny / Level 1 work with clean context
+- recommended for independent normal tasks or phase changes
+- required for Level 3 / Level 4, long / overnight / complex resume work, dirty context, or explicit User reset request
+
+### Design alignment
+
+Architect SHOULD periodically run a lightweight Design Alignment Review after several related tasks, milestone / phase boundaries, long / overnight work, complex resume work, or when Builder / User flags drift.
+
+Design baseline, in order:
+
+- `PROJECT_DESIGN.md`, if present
+- `AI_CONTEXT.md` latest decisions and architecture notes
+- README / product docs / explicit User goals
+- current Task Card
+
+Possible outcomes:
+
+- `STILL ALIGNED`：continue.
+- `DRIFT NEEDS CORRECTION`：open a correction Task Card before further expansion.
+- `BETTER DIRECTION FOUND`：present a design update proposal to User; do not silently accept the new direction.
+
+Builder may flag design drift, but Architect owns the review and User confirms accepted direction changes.
 
 ## Operating Model
 
