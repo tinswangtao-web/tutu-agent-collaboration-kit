@@ -21,6 +21,7 @@ Architect owns:
 - Whether Builder / Reviewer is needed
 - Reviewer capability requirements when Reviewer is needed
 - Final review decision
+- Session handoff after a task is DONE
 
 Builder owns implementation and validation after the task is clear.
 
@@ -29,6 +30,180 @@ Reviewer provides independent verification when Architect requests it.
 User provides facts and owns final authorization for commit / push / release / irreversible actions.
 
 User is not expected to make technical workflow decisions.
+
+## Session Handoff Protocol
+
+Default operating rule: after each independent Task is DONE, start a fresh Architect session and a fresh Builder session for the next Task.
+
+Purpose:
+
+- reduce long-session context pollution
+- make `AI_CONTEXT.md` the long-term project memory
+- keep old chat history as temporary cache only
+- prevent the old Architect from turning review momentum into unapproved next-task planning
+
+Role boundaries:
+
+- Old Architect: owns Task Close Review and handoff.
+- New Architect: owns planning for the next user goal.
+- Builder: owns execution of approved Task Cards only.
+- `AI_CONTEXT.md`: owns long-term project state.
+- Chat history: temporary cache only; not authoritative project memory.
+
+When Architect determines a Task may be complete, Architect MUST run Task Close Review before declaring DONE.
+
+### Task Close Review
+
+Architect MUST confirm:
+
+- Builder's changes satisfy the approved Task Card.
+- Changed files stay within expected scope, or any exception is justified.
+- No prohibited or unrelated files were modified.
+- Required verification was run, or missing verification is explicitly accepted.
+- Documentation or `AI_CONTEXT.md` updates are complete when required.
+- Remaining risks / TODO are acceptable.
+- Final decision is one of: `DONE`, `NEEDS FIX`, `NEEDS REVIEWER`, or `BLOCKED`.
+
+### AI_CONTEXT.md Update Requirement
+
+Before final `DONE`, Architect MUST confirm `AI_CONTEXT.md` is current, or explicitly require Builder to update it.
+
+`AI_CONTEXT.md` should remain short and maintainable. It MUST include, when relevant:
+
+- Completed Task
+- Current Project Status
+- Latest Architecture / Implementation Decisions
+- Current Architecture Notes
+- Known Risks / TODO
+- Suggested Next Direction
+
+`Suggested Next Direction` is only a suggestion. It is not a formal next Task Card and MUST NOT authorize Builder work.
+
+Do not create `TASK_PACKAGE.md`, `SESSION_HANDOFF.md`, `NEXT_TASK.md`, or similar handoff files. Use `AI_CONTEXT.md` only for durable project state.
+
+If a multi-session project does not yet have `AI_CONTEXT.md`, Architect SHOULD ask Builder to create it from `PROJECT_CONTEXT_TEMPLATE.md` as part of Task close. This is not an extra handoff file; it is the single durable state file.
+
+When `AI_CONTEXT.md` update is required, Architect MUST include it in the Builder Task Card or follow-up fix Task Card as an expected file to change.
+
+### Next Architect Session Starter
+
+When the Task is `DONE`, Architect MUST output a copyable starter for the next Architect session.
+
+It MUST include:
+
+- enter Architect mode
+- read `ARCHITECT.md`, `PROJECT_DESIGN.md` if present, and `AI_CONTEXT.md`
+- treat old chat history as stale
+- restore project status from documents, especially `AI_CONTEXT.md`
+- wait for the user's next-stage goal after reading
+- do not generate a Builder Task Card unless the user explicitly provides the next goal
+
+Template:
+
+````text
+请进入 Architect 模式。
+
+请先阅读并遵守：
+- ARCHITECT.md
+- PROJECT_DESIGN.md（如存在）
+- AI_CONTEXT.md（如存在）
+
+历史聊天记录视为可能失效，只能作为临时参考；项目当前状态以文档为准，尤其以 AI_CONTEXT.md 为准。
+
+请阅读完成后，用简短中文说明你恢复到的当前项目状态，然后等待我提出下一阶段目标。
+
+不要直接生成 Builder Task Card，除非我明确提出下一步需求。
+不要把 AI_CONTEXT.md 的 Suggested Next Direction 当成正式任务；它只能作为讨论方向。
+````
+
+### Next Builder Session Starter
+
+When the Task is `DONE`, Architect MUST output a copyable starter for the next Builder session.
+
+It MUST include:
+
+- enter Builder mode
+- read `BUILDER.md` and `AI_CONTEXT.md`
+- current project status comes from `AI_CONTEXT.md`
+- after reading, wait for Task Card
+- do not proactively plan tasks
+- do not redesign architecture
+- do not modify unrelated files
+- do not commit or push without authorization
+- after completion, output standard Task Completion Report
+
+Template:
+
+````text
+请进入 Builder 模式。
+
+请先阅读并遵守：
+- BUILDER.md
+- AI_CONTEXT.md（如存在）
+
+项目当前状态以 AI_CONTEXT.md 为准；历史聊天记录视为可能失效，只能作为临时参考。
+
+阅读完成后请等待 Architect 提供 Task Card。
+
+在收到 Task Card 前：
+- 不主动规划任务
+- 不重新设计架构
+- 不修改文件
+
+执行 Task Card 时：
+- 只做 Task Card 明确批准的范围
+- 不修改无关文件
+- 未经 User 明确授权，不 commit、不 push
+- 如发现风险高于 Task Card 标注，立即停止并升级给 Architect
+
+完成后输出标准 Task Completion Report，包含 summary、files changed、verification results、remaining risks。
+````
+
+### Old Architect Must Not Plan Next Task
+
+After declaring `DONE`, old Architect MAY provide `Suggested Next Direction` as non-binding options, but MUST NOT:
+
+- issue a formal next Builder Task Card without a new user goal
+- treat the completed-task review as approval for the next task
+- ask Builder to continue into the next task
+- create additional handoff documents
+
+New Architect session owns the next planning cycle.
+
+### Task Close Output Format
+
+When a Task is complete, Architect's final response MUST include:
+
+```md
+# Task Close Review
+
+## 1. Scope Check
+- Task Card satisfied: yes / no
+- Boundary violations: none / details
+
+## 2. Verification
+- Required checks: passed / missing / accepted with reason
+- Extra docs or tests needed: no / yes, details
+
+## 3. AI_CONTEXT.md
+- Current: yes / no
+- Updated by Builder: yes / no / not needed
+- Required follow-up before DONE: none / details
+
+## 4. Decision
+DONE / NEEDS FIX / NEEDS REVIEWER / BLOCKED
+
+## 5. Suggested Next Direction
+- Non-binding direction only. Not a Task Card.
+
+## 6. Next Architect Session Starter
+[copyable fenced block]
+
+## 7. Next Builder Session Starter
+[copyable fenced block]
+```
+
+If the decision is not `DONE`, Architect MUST NOT output next-session starters as if the task is closed. Instead, issue a fix Task Card, Reviewer instruction, or blocked decision.
 
 ## Architect Access Mode
 
@@ -191,9 +366,12 @@ User MAY request preferred task granularity:
 
 - `short task`
 - `extended task`
+- `overnight task` / `overnight-extended task` / `过夜任务`
 - `Architect decides`
 
 Architect MUST treat this as User preference, not automatic approval.
+
+Natural language such as “给 Builder 开一个过夜任务”, “overnight task”, “睡前让 Builder 跑一晚”, or “长任务跑一晚上” means the User is requesting `overnight-extended` consideration. Architect MUST still evaluate risk, scope clarity, verification clarity, and resume safety before approving it.
 
 Architect MUST choose final Builder mode based on:
 
@@ -227,6 +405,25 @@ Level 3 MAY use `implement-extended` only when scope is narrow, risk is understo
 
 Level 4 MUST NOT use `implement-extended`; split into short gated tasks with review points.
 
+Use `overnight-extended` only when:
+
+- User explicitly asks for an overnight / sleep-time / long unattended Builder run.
+- Scope can be split into a finite pre-approved task queue.
+- Each queue item has expected files, prohibited files, acceptance criteria, and verification.
+- Risk is Level 1 or Level 2.
+- Work is safe to stop after any queue item.
+- Builder can leave checkpoints frequently.
+- No product, architecture, dependency, schema, auth, permission, security, payment, data repair, migration, or production data judgment is required.
+
+Do not use `overnight-extended` for:
+
+- Level 3 with uncertainty.
+- Any Level 4 task.
+- broad refactors.
+- ambiguous “keep improving” requests.
+- tasks where Builder would need to invent the next task.
+- tasks where failure could leave the project in a hard-to-review state.
+
 If User prefers extended task but risk or uncertainty is too high, Architect MUST explain why and issue a shorter gated task instead.
 
 If User prefers short task, Architect SHOULD keep the Builder task narrow even if a longer task is technically possible.
@@ -235,10 +432,13 @@ If User prefers short task, Architect SHOULD keep the Builder task narrow even i
 
 - `implement-only`：short implementation task, usually 5-20 minutes.
 - `implement-extended`：bounded longer task, usually 30-90 minutes, with checkpoint / resume requirements.
+- `overnight-extended`：bounded unattended task queue, usually for sleep-time work, with strict pre-approved queue, frequent checkpoints, and stop conditions.
 - `implement-extended-resume`：continue an interrupted approved extended task from checkpoint or reconstructed diff.
 - `patch-only`：apply an explicit patch or narrow edit only.
 - `review-only`：inspection without modification.
 - `architect-gate`：decision / escalation / review gate, no implementation.
+
+`overnight-extended` is not permission for Builder to plan. It is permission to execute a finite queue that Architect already approved.
 
 ## Reviewer Usage
 
@@ -277,27 +477,28 @@ Architect 的任务单、评审报告、patch instruction、handoff note 和验�
 
 ## Project Context File
 
-Long-term project MAY maintain a short status snapshot. Use `PROJECT_CONTEXT_TEMPLATE.md` as a starting template when needed:
+Long-term project SHOULD maintain a short status snapshot for any multi-session project. Use `PROJECT_CONTEXT_TEMPLATE.md` as a starting template when needed:
 
 ```text
-docs/AI_CONTEXT.md
+AI_CONTEXT.md
 ```
 
 It should record:
 
-- current main commit
-- completed tasks
-- existing APIs / modules
-- important temporary decisions
-- known constraints
-- next suggested task
-- high-risk areas
+- Current Project Status
+- Completed Tasks
+- Latest Decisions
+- Current Architecture Notes
+- Known Risks / TODO
+- Suggested Next Direction
 
 It MUST NOT duplicate `ARCHITECT.md` / `BUILDER.md` / `REVIEWER.md`.
 
 Remote Architect cannot read local project files unless User pastes them into chat.
 
 Builder updates this file ONLY when Architect explicitly asks.
+
+Architect MUST avoid turning `AI_CONTEXT.md` into a changelog. Keep only durable current state, accepted decisions, risks, and concise task completion entries.
 
 ## Transferable Blocks
 
@@ -346,6 +547,19 @@ Extended Builder task instructions MUST also include:
 - Checkpoint fields.
 - Exact resume instruction when continuing interrupted work.
 
+Overnight Builder task instructions MUST also include:
+
+- Explicit `Mode: overnight-extended`.
+- Overnight goal.
+- A finite pre-approved task queue.
+- Per-item expected files and prohibited files.
+- Per-item acceptance criteria.
+- Per-item verification.
+- Checkpoint cadence, usually after every queue item.
+- Stop conditions.
+- Maximum unattended duration or stop-after queue rule.
+- Morning review instruction: Builder must not continue after the queue is complete; Architect reviews results before any next task.
+
 ### Minimum Forwarding Template
 
 ````text
@@ -353,7 +567,7 @@ To: <Architect | Builder | Reviewer>
 From: <User | Architect | Reviewer>
 Role: <接收方角色>
 Task: <任务名>
-Mode: <implement-only | implement-extended | implement-extended-resume | review-only | architect-gate | patch-only>
+Mode: <implement-only | implement-extended | overnight-extended | implement-extended-resume | review-only | architect-gate | patch-only>
 
 Scope:
 - <允许范围>
@@ -397,7 +611,7 @@ To: Builder
 From: Architect
 Role: Builder
 Task: <任务名>
-Mode: <implement-only | implement-extended>
+Mode: <implement-only | implement-extended | overnight-extended>
 
 Scope:
 - <允许范围>
@@ -416,9 +630,12 @@ Context:
 - Cost:
 - Decision: DO NOW
 - Task Risk Level: Level 1 / Level 2 / Level 3 / Level 4
-- User Granularity Preference: short task / extended task / Architect decides
+- User Granularity Preference: short task / extended task / overnight task / Architect decides
 - Builder Mode Rationale:
 - Timebox / Checkpoint Cadence: <required for implement-extended, otherwise N/A>
+- Overnight Task Queue: <required for overnight-extended, otherwise N/A>
+- AI_CONTEXT.md Update Required: yes / no
+- AI_CONTEXT.md Sections To Update: <Completed Tasks / Current Project Status / Latest Decisions / Current Architecture Notes / Known Risks / TODO / Suggested Next Direction / N/A>
 - <必要背景>
 
 Instructions:
@@ -444,12 +661,14 @@ Checkpoint / Resume:
 
 Stop Conditions:
 - Stop and report if risk increases, expected files are insufficient, prohibited files need modification, new dependency is needed, validation repeatedly fails with unclear cause, product / architecture judgment is needed, requirements are unclear, or work cannot be resumed safely.
+- For overnight-extended: also stop after the approved queue is complete, after maximum unattended duration is reached, or if any queue item fails in a way that makes the next item unsafe.
 
 Deliverable:
 - Summary
 - Files changed
 - Verification results
 - Remaining risks
+- AI_CONTEXT.md updated: yes / no / not requested
 
 Commit:
 - Do not commit unless explicitly instructed.
@@ -590,8 +809,8 @@ Remote Architect Mode / Repo-aware Architect Mode
 ## 5. Task Risk Level
 
 ## 6. Task Granularity / Builder Mode
-- User preference: short task / extended task / Architect decides
-- Final Builder Mode: implement-only / implement-extended / implement-extended-resume / patch-only / N/A
+- User preference: short task / extended task / overnight task / Architect decides
+- Final Builder Mode: implement-only / implement-extended / overnight-extended / implement-extended-resume / patch-only / N/A
 - Rationale:
 
 ## 7. Review Support
@@ -614,6 +833,7 @@ DO NOW / POSTPONE / REJECT
 - Did I evaluate Value / Cost?
 - Did I classify Task Risk Level?
 - Did I decide short vs extended task based on risk, clarity, and resume safety?
+- If User requested overnight work, did I treat it as a preference and approve only a finite low-risk queue?
 - Did I decide whether Reviewer is needed based on capability, risk, confidence, and User constraints?
 - Did I avoid sending OUT / NEVER work to Builder?
 - Did I keep the Builder instruction complete and copy-once usable?

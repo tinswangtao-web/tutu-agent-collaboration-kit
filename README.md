@@ -1,7 +1,7 @@
 # Tutu Agent Collaboration Kit
 
 Status: Stable
-Version: v3.1.4
+Version: 3.2
 
 一个面向个人软件项目的轻量 AI 协作规则。目标是让不懂代码的 Project Owner 也能稳定协调多个可替换 AI 进行长期开发。
 
@@ -9,6 +9,12 @@ Version: v3.1.4
 
 ```text
 User → Architect → Builder → Architect review → User
+```
+
+每个独立 Task 完成后，推荐开启新的 Architect 会话和新的 Builder 会话，以减少长会话上下文污染：
+
+```text
+Old Architect closes Task → AI_CONTEXT.md current → New Architect waits for user goal → New Builder waits for approved Task Card
 ```
 
 当任务风险较高、Architect 无法直接读取 repo，或代码级证据不足时，Architect 可以按需启用 Reviewer：
@@ -21,6 +27,7 @@ User → Architect → Builder → Reviewer → Architect → User
 
 ```text
 默认轻流程；按能力和风险逐级加审查。
+每个 Task 完成后，用 AI_CONTEXT.md 交接长期状态。
 ```
 
 ## Files
@@ -29,7 +36,7 @@ User → Architect → Builder → Reviewer → Architect → User
 - `ARCHITECT.md`：Architect 规则、Access Mode、Task Risk Level、handoff。
 - `BUILDER.md`：Builder 执行、验证、报告与升级规则。
 - `REVIEWER.md`：optional repo-aware 审查角色规则。
-- `PROJECT_CONTEXT_TEMPLATE.md`：具体项目状态快照模板。
+- `PROJECT_CONTEXT_TEMPLATE.md`：`AI_CONTEXT.md` 项目状态快照模板。
 
 ## Roles
 
@@ -42,6 +49,14 @@ User → Architect → Builder → Reviewer → Architect → User
 ### Optional support
 
 - `Reviewer`：按 Architect 要求进行独立审查，通常需要 repo / diff / file access。Reviewer 不是常驻角色，不做最终架构决策，不直接指挥 Builder，不擅自改代码。
+
+### Session handoff boundaries
+
+- Old Architect：Task Close Review、确认 `AI_CONTEXT.md` 更新、输出下一 Architect / Builder 会话启动词。
+- New Architect：先等待用户新的下一阶段目标，再进行 Planning 并生成新的 Task Card。
+- Builder：只执行 approved Task Card；新 Builder 会话读取规则和 `AI_CONTEXT.md` 后等待任务。
+- `AI_CONTEXT.md`：长期项目状态记忆。
+- Chat history：临时缓存，不作为长期项目记忆。
 
 ## Operating Model
 
@@ -71,9 +86,12 @@ User MAY request preferred task granularity:
 
 - `short task`：先快速验证方向，减少不确定性。
 - `extended task`：让 Builder 连续执行一个完整工作包，提高效率。
+- `overnight task` / `过夜任务`：让 Builder 在睡前执行一组有限、低风险、预先批准的 unattended task queue。
 - `Architect decides`：由 Architect 按风险和清晰度决定。
 
 Architect MUST treat User granularity as preference, not automatic approval.
+
+如果 User 用自然语言说“给 Builder 开一个过夜任务”、“overnight task”、“睡前让 Builder 跑一晚”、“长任务跑一晚上”，Architect 应识别为 `overnight-extended` 偏好，但只能在低风险、范围清楚、可频繁 checkpoint、无需 Builder 自行规划时批准。
 
 Use short task when:
 
@@ -100,22 +118,45 @@ Builder modes include:
 
 - `implement-only`
 - `implement-extended`
+- `overnight-extended`
 - `implement-extended-resume`
 - `patch-only`
 - `review-only`
 - `architect-gate`
 
+`overnight-extended` 不是让 Builder 自己设计下一步；它只能执行 Architect 预先列出的有限队列。队列完成、风险升高、验证失败或需要架构判断时，Builder 必须停止并输出 completion report / handoff，等待 morning Architect review。
+
 ## Project Context File
 
-长期项目 MAY 维护短小状态快照，例如：
+长期项目 SHOULD 维护短小状态快照，例如：
 
 ```text
-docs/AI_CONTEXT.md
+AI_CONTEXT.md
 ```
 
 它只记录项目状态，不复制本规则。Remote Architect 无法读本地文件时，User 可以把该文件内容粘贴进新会话。
 
 具体项目知识，例如业务实体、技术栈、数据库、模块边界、当前任务状态，应该写入 `AI_CONTEXT.md`，不要写入本协议主体。
+
+推荐结构：
+
+```md
+# AI_CONTEXT
+
+## Current Project Status
+
+## Completed Tasks
+
+## Latest Decisions
+
+## Current Architecture Notes
+
+## Known Risks / TODO
+
+## Suggested Next Direction
+```
+
+`Suggested Next Direction` 只是建议方向，不等同于正式下一任务。不要新增 `TASK_PACKAGE.md`、`SESSION_HANDOFF.md`、`NEXT_TASK.md` 等额外交接文件。
 
 ## Transferable Blocks
 
@@ -150,7 +191,7 @@ To: <Architect | Builder | Reviewer>
 From: <User | Architect | Reviewer>
 Role: <接收方角色>
 Task: <任务名>
-Mode: <implement-only | implement-extended | implement-extended-resume | review-only | architect-gate | patch-only>
+Mode: <implement-only | implement-extended | overnight-extended | implement-extended-resume | review-only | architect-gate | patch-only>
 
 Scope:
 - <允许范围>
@@ -206,7 +247,16 @@ Commit:
 - Resume safety：中断后必须能通过 git diff、checkpoint、handoff note 续上。
 - Stop conditions：风险升高、expected files 不够、需要改 prohibited files、需要新增 dependency、连续验证失败、需要猜需求时停下报告。
 - Checkpoint fields：current task、completed steps、files changed so far、remaining steps、validation run、validation pending、known risks / blockers、exact next step。
-- Level 4 MUST NOT use extended task。
+- Level 4 MUST NOT use extended task / overnight task。
+
+给 Builder 的 overnight task 还 MUST 明确：
+
+- finite pre-approved task queue。
+- per-item expected files / prohibited files。
+- per-item acceptance criteria / verification。
+- checkpoint after every queue item。
+- maximum unattended duration or stop-after queue rule。
+- morning review instruction。
 
 ---
 

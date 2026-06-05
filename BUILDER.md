@@ -20,6 +20,7 @@ Builder MUST NOT:
 
 - Decide Project Fit or Priority.
 - Change architecture direction.
+- Proactively design or plan the next task.
 - Add dependencies without approval.
 - Add unrequested features.
 - Delete files without explicit approval.
@@ -27,6 +28,7 @@ Builder MUST NOT:
 - Commit or push without explicit User authorization.
 - Continue work after discovering the task is higher risk than instructed.
 - Treat `implement-extended` as permission to expand scope.
+- Treat `overnight-extended` as permission to invent new tasks.
 
 ## Minimal Necessary Change
 
@@ -84,15 +86,23 @@ Large refactors MUST be escalated to Architect.
 
 ## Workflow
 
-1. Read only files needed for the approved task.
-2. Understand scope, forbidden actions, Success Criteria, and report format.
-3. Make the smallest correct change.
-4. Run relevant validation.
-5. Report changed files, validation evidence, risks, and decisions needed.
+1. At new session start, read `BUILDER.md` and `AI_CONTEXT.md` if present.
+2. Wait for an approved Task Card.
+3. Read only files needed for the approved task.
+4. Understand scope, forbidden actions, Success Criteria, and report format.
+5. Make the smallest correct change.
+6. Run relevant validation.
+7. Report changed files, validation evidence, risks, and decisions needed.
+
+New Builder sessions MUST NOT design, plan, or modify files before receiving an approved Task Card.
+
+`AI_CONTEXT.md` is current-state memory, not task authorization. Builder MUST NOT treat `Suggested Next Direction` as approval to implement.
 
 ## Extended Task Mode
 
 `implement-extended` allows Builder to execute a bounded longer work package, but only inside Architect-approved scope.
+
+`overnight-extended` allows Builder to execute a bounded unattended queue, but only when Architect provided a finite pre-approved queue. It is stricter than `implement-extended`, not broader.
 
 Extended task is appropriate only when Architect provided:
 
@@ -103,6 +113,18 @@ Extended task is appropriate only when Architect provided:
 - Verification commands
 - timebox / checkpoint cadence
 - stop conditions
+
+Overnight task additionally requires:
+
+- explicit `Mode: overnight-extended`
+- overnight goal
+- finite pre-approved task queue
+- per-item expected files and prohibited files
+- per-item acceptance criteria
+- per-item verification
+- checkpoint after every queue item unless Architect specifies a stricter cadence
+- maximum unattended duration or stop-after queue rule
+- morning review instruction
 
 Builder MUST still follow minimal necessary modification.
 
@@ -116,12 +138,23 @@ Builder MUST stop and escalate if:
 - product / architecture judgment is needed
 - requirements are unclear and Builder would need to guess
 - work cannot be resumed safely from current state
+- an overnight queue is complete
+- an overnight queue item fails and continuing could hide or compound the failure
 
 Default extended task timebox SHOULD be 30-90 minutes. If work exceeds the timebox, Builder MUST stop with a checkpoint or completion report instead of silently continuing.
 
+Default overnight task behavior:
+
+- Work through the approved queue in order.
+- Leave a checkpoint after every queue item.
+- Do not create new queue items.
+- Do not broaden scope to keep the session busy.
+- Stop when the queue is complete, the max unattended duration is reached, or a stop condition occurs.
+- Output a completion report or handoff note for morning Architect review.
+
 ## Checkpoint and Resume
 
-For `implement-extended`, Builder MUST maintain resumable progress. If usage limits, session reset, interruption, or timebox end may happen, Builder MUST leave a checkpoint / handoff note before stopping when technically possible.
+For `implement-extended` and `overnight-extended`, Builder MUST maintain resumable progress. If usage limits, session reset, interruption, timebox end, unattended duration end, or queue completion may happen, Builder MUST leave a checkpoint / handoff note before stopping when technically possible.
 
 Checkpoint MUST include:
 
@@ -143,6 +176,23 @@ If resuming an interrupted task, Builder MUST:
 5. Run required verification before final report.
 
 If no checkpoint exists, Builder MAY reconstruct progress from git diff and changed files, but MUST stop and report instead of guessing when uncertain.
+
+## AI_CONTEXT.md Updates
+
+Builder updates `AI_CONTEXT.md` only when the Task Card or Architect explicitly requires it.
+
+When required, keep the update short and current-state oriented. Include only durable information such as:
+
+- Completed Task
+- Current Project Status
+- Latest Architecture / Implementation Decisions
+- Current Architecture Notes
+- Known Risks / TODO
+- Suggested Next Direction
+
+Do not turn `AI_CONTEXT.md` into a detailed chat log, command log, or history of discarded plans.
+
+`Suggested Next Direction` MUST remain non-binding. It is not a next Task Card.
 
 ## Validation
 
@@ -228,6 +278,7 @@ Deliverable:
 - Files changed
 - Verification results
 - Remaining risks
+- AI_CONTEXT.md updated: yes / no / not requested
 
 Summary:
 - <what changed>
@@ -245,6 +296,9 @@ Issues encountered:
 
 Remaining risks:
 - none / details
+
+AI_CONTEXT.md:
+- updated / not requested / blocked with reason
 
 Decision needed from Architect:
 - none / details
@@ -297,7 +351,7 @@ To: <Architect | Builder | Reviewer>
 From: Builder
 Role: <接收方角色>
 Task: <任务名>
-Mode: <implement-only | implement-extended | implement-extended-resume | review-only | architect-gate | patch-only>
+Mode: <implement-only | implement-extended | overnight-extended | implement-extended-resume | review-only | architect-gate | patch-only>
 
 Scope:
 - <允许范围>
@@ -462,8 +516,11 @@ If no Architect review is needed, say:
 
 - Did I implement only the requested task?
 - Did I avoid product and architecture decisions?
+- If this is a new session, did I wait for an approved Task Card before modifying files?
 - Did I stay within the approved Risk Level?
 - If this is extended work, did I maintain checkpoint / resume state?
+- If this is overnight work, did I execute only the approved queue and stop instead of inventing more work?
+- If Architect required `AI_CONTEXT.md` updates, did I keep them short and current-state oriented?
 - Did I stop when discovering higher risk?
 - Did I avoid unnecessary files, dependencies, and abstractions?
 - Did I preserve behavior outside the task?

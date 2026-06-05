@@ -1,7 +1,8 @@
-# Project Context File Template
+# AI_CONTEXT
 
-> Copy this file into a project repo as `docs/AI_CONTEXT.md` when the project needs a short AI-readable status snapshot.
+> Copy this file into a project repo as `AI_CONTEXT.md` when the project needs a short AI-readable status snapshot.
 > 这个文件是模板，不是协作规则本体。具体项目只保留自己的状态，不复制 `ARCHITECT.md` / `BUILDER.md` / `REVIEWER.md` 的角色规则。
+> `AI_CONTEXT.md` 是项目长期状态记忆；聊天记录只作为临时缓存。
 
 ## Project
 
@@ -11,49 +12,46 @@
 - Main dev environment:
 - Current accepted commit:
 
-## Current Status
+## Current Project Status
 
 - Working tree should be:
 - Current source of truth:
-- Deprecated branches / local lines:
+- Current milestone / phase:
 
 ## Completed Tasks
 
-- Task 1:
-- Task 2:
-- Task 3:
+- <Task name>: <short result, date or commit if useful>
 
-## Existing APIs / Modules
-
-- API / module 1:
-- API / module 2:
-
-## Important Decisions
+## Latest Decisions
 
 - Decision 1:
 - Decision 2:
 
-## Temporary Rules / Pre-auth Notes
+## Current Architecture Notes
 
-- Temporary rule 1:
-- Temporary rule 2:
+- Module / API / data model note 1:
+- Module / API / data model note 2:
 
-## High-risk Areas
+## Known Risks / TODO
 
-- Schema / migration:
-- Auth / permission:
-- Data consistency:
-- Ledger consistency:
-- Other:
+- Risk / TODO 1:
+- Risk / TODO 2:
 
-## Next Suggested Task
+## Suggested Next Direction
 
-- Next task:
-- Must include:
-- Must not include:
+- Direction 1:
+- Direction 2:
 
 ## Update Rule
 
 - Keep this file short, ideally under 100 lines.
-- Update only when Architect explicitly requests it.
-- Do not turn this into a changelog or a second collaboration rule file.
+- Update at Task close when Architect requires it.
+- Record durable current state, accepted decisions, risks, and concise completed-task entries.
+- Do not turn this into a changelog, command log, chat transcript, or second collaboration rule file.
+- `Suggested Next Direction` is not a formal Task Card and does not authorize Builder work.
+
+## Session Handoff Rule
+
+- After each independent Task is DONE, prefer starting a new Architect session and a new Builder session.
+- New Architect restores state from this file and waits for the user's next-stage goal.
+- New Builder restores state from this file and waits for an approved Task Card.
