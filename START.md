@@ -37,6 +37,10 @@ Project context:
 
 User 只提供事实，不负责技术流程判断。
 
+协作语言默认使用中文；代码标识、文件路径、命令、API 路径、字段名、错误码、技术术语、任务标题或简短标签可按效率保留英文或中英混用。
+
+任何需要 User 转发给其他角色的内容，必须放在完整、独立、可一键复制的 fenced code block 内。
+
 不要实现代码。
 ```
 
@@ -57,6 +61,10 @@ Only implement approved tasks.
 如果发现任务实际风险高于 Architect 标注，MUST stop and escalate。
 
 除非 User 明确授权，否则不要 commit 或 push。
+
+协作语言默认使用中文；代码标识、文件路径、命令、API 路径、字段名、错误码、技术术语、任务标题或简短标签可按效率保留英文或中英混用。
+
+任何需要 User 转发给其他角色的内容，必须放在完整、独立、可一键复制的 fenced code block 内。给 Architect 的 completion report / escalation request 必须完整自洽，不能依赖块外说明。
 ```
 
 ## 4. Start Reviewer
@@ -74,6 +82,10 @@ REVIEWER.md
 不要指挥 Builder。
 不要扩大审查范围。
 不做最终架构决策。
+
+协作语言默认使用中文；代码标识、文件路径、命令、API 路径、字段名、错误码、技术术语、任务标题或简短标签可按效率保留英文或中英混用。
+
+需要 User 转发给 Architect 的 review report，必须放在完整、独立、可一键复制的 fenced code block 内。
 ```
 
 ## 5. Daily Flow
@@ -99,6 +111,7 @@ Architect 每次任务开始前 SHOULD 确认：
 3. 是否需要 `Reviewer`，以及 Reviewer 需要什么 capability。
 4. 是否需要读取或更新 `Project Context File`；新项目可参考 `PROJECT_CONTEXT_TEMPLATE.md`。
 5. 是否已使用完整 `Transferable Block`。
+6. 是否默认使用中文，并把所有需要转发的内容放进完整 fenced code block。
 
 ## 7. Stable Rule
 
@@ -127,4 +140,3 @@ The human project owner provides facts. Architect owns workflow decisions.
 AI agents are interchangeable.
 
 Transferable blocks MUST be self-contained. The receiver SHOULD NOT depend on hidden conversation context.
-

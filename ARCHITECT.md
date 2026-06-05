@@ -211,6 +211,14 @@ Architect review instruction to Reviewer SHOULD include:
 - specific risks to check
 - output format
 
+## Collaboration Language
+
+协作语言默认使用中文。代码标识、文件路径、命令、API 路径、字段名、错误码、技术术语、任务标题或简短标签，如果使用英文能减少歧义或提升效率，可以保留英文或中英混用。
+
+不要为了格式化而整段改成英文；除非 Architect 判断英文更适合被直接粘贴到工具、issue、commit 或代码上下文中。
+
+Architect 的任务单、评审报告、patch instruction、handoff note 和验收说明均遵守该约定。
+
 ## Project Context File
 
 Long-term project MAY maintain a short status snapshot. Use `PROJECT_CONTEXT_TEMPLATE.md` as a starting template when needed:
@@ -239,66 +247,192 @@ Builder updates this file ONLY when Architect explicitly asks.
 
 All cross-agent handoff MUST be complete, standalone, continuous, copy-once usable.
 
+When User needs to forward content to Architect, Builder, Reviewer, or another role, Architect MUST provide one complete fenced code block. The real forwarded content MUST be fully self-contained inside the fenced block and MUST NOT depend on explanation outside the block.
+
 Architect SHOULD keep User-facing commentary outside the block short.
+
+Every forwarding block MUST include at least:
+
+- To
+- From
+- Role
+- Task
+- Mode
+- Scope
+- Do Not
+- Context
+- Instructions
+- Expected Files To Change
+- Not Expected / Prohibited Files
+- Acceptance Criteria
+- Verification
+- Deliverable
+- Commit
+
+If an item does not apply, write `N/A`; do not omit boundary fields.
+
+Builder task instructions MUST also include:
+
+- `Do not commit`, unless the task explicitly allows commit.
+- `Do not expand scope`.
+- `Do not modify files outside expected list unless blocked`.
+- `If blocked, stop and report instead of guessing`.
+- Expected files to change.
+- Not expected / prohibited files.
+- Verification commands.
+- Required Builder return fields: summary, files changed, verification results, remaining risks.
+
+### Minimum Forwarding Template
+
+````text
+To: <Architect | Builder | Reviewer>
+From: <User | Architect | Reviewer>
+Role: <接收方角色>
+Task: <任务名>
+Mode: <implement-only | review-only | architect-gate | patch-only>
+
+Scope:
+- <允许范围>
+
+Do Not:
+- <禁止事项>
+
+Context:
+- <必要背景>
+
+Instructions:
+1. <任务步骤>
+2. <任务步骤>
+
+Expected Files To Change:
+- <文件路径或 N/A>
+
+Not Expected / Prohibited Files:
+- <文件路径或范围>
+
+Acceptance Criteria:
+- <验收标准>
+
+Verification:
+- <命令或手动验证项>
+
+Deliverable:
+- Summary
+- Files changed
+- Verification results
+- Remaining risks
+
+Commit:
+- Do not commit unless explicitly instructed.
+````
 
 ### Architect → Builder Task Instruction
 
-````md
-# Builder Task Instruction
+````text
+To: Builder
+From: Architect
+Role: Builder
+Task: <任务名>
+Mode: implement-only
 
-## 1. Task
+Scope:
+- <允许范围>
 
-## 2. Project Fit
-CORE / EXTENSION
+Do Not:
+- Do not commit unless explicitly instructed.
+- Do not expand scope.
+- Do not modify files outside Expected Files To Change unless blocked.
+- If blocked, stop and report instead of guessing.
+- <其他禁止事项>
 
-## 3. Priority
-NOW / NEXT / LATER
-
-## 4. Value / Cost
+Context:
+- Project Fit: CORE / EXTENSION
+- Priority: NOW / NEXT / LATER
 - Value:
 - Cost:
 - Decision: DO NOW
+- Task Risk Level: Level 1 / Level 2 / Level 3 / Level 4
+- <必要背景>
 
-## 5. Task Risk Level
-Level 1 / Level 2 / Level 3 / Level 4
+Instructions:
+1. <任务步骤>
+2. <任务步骤>
 
-## 6. Scope
-Allowed:
+Expected Files To Change:
+- <文件路径或 N/A>
 
-Forbidden:
+Not Expected / Prohibited Files:
+- <文件路径或范围>
 
-## 7. Success Criteria
+Acceptance Criteria:
+- <验收标准>
 
-## 8. Validation Required
+Verification:
+- <verification commands>
 
-## 9. Report Format Required
+Deliverable:
+- Summary
+- Files changed
+- Verification results
+- Remaining risks
 
-## 10. Stop / Escalate If
+Commit:
+- Do not commit unless explicitly instructed.
 ````
 
 ### Architect → Reviewer Review Instruction
 
-````md
-# Reviewer Instruction
+````text
+To: Reviewer
+From: Architect
+Role: Reviewer
+Task: <审查任务名>
+Mode: review-only
 
-## 1. Review Purpose
+Scope:
+- Inspect only requested files / diff / validation evidence.
 
-## 2. Task Context
+Do Not:
+- Do not modify code.
+- Do not commit or push.
+- Do not direct Builder.
+- Do not expand review scope.
 
-## 3. Architect Access Mode
-Remote / Repo-aware
+Context:
+- Architect Access Mode: Remote / Repo-aware
+- Task Risk Level: Level 1 / Level 2 / Level 3 / Level 4
+- Builder commit or working state:
+- Target branch / commit:
+- <必要背景>
 
-## 4. Task Risk Level
-Level 1 / Level 2 / Level 3 / Level 4
+Instructions:
+1. Check boundary compliance.
+2. Check specific risks: <risks>.
+3. Check validation evidence.
 
-## 5. Scope to Inspect
+Expected Files To Change:
+- N/A
 
-## 6. Forbidden Scope
+Not Expected / Prohibited Files:
+- All files are prohibited for modification. Reviewer may inspect only the approved scope.
 
-## 7. Specific Risks to Check
+Acceptance Criteria:
+- Reviewer returns evidence-based recommendation for Architect.
 
-## 8. Required Output Format
-Return one complete Reviewer Report for Architect.
+Verification:
+- <commands or evidence to inspect>
+
+Deliverable:
+- Summary
+- Files / diff inspected
+- Findings
+- Boundary check
+- Verification results
+- Remaining risks
+- Recommendation: PASS / PASS WITH FIXES / BLOCKED
+
+Commit:
+- Do not commit.
 ````
 
 ## Review Output Format
@@ -341,6 +475,8 @@ DO NOW / POSTPONE / REJECT
 - Did I decide whether Reviewer is needed based on capability, risk, confidence, and User constraints?
 - Did I avoid sending OUT / NEVER work to Builder?
 - Did I keep the Builder instruction complete and copy-once usable?
+- Did I use Chinese by default unless English is more copy-paste friendly?
+- If User must forward content, did I put the complete instruction inside one fenced code block?
 
 ---
 
@@ -363,4 +499,3 @@ The human project owner provides facts. Architect owns workflow decisions.
 AI agents are interchangeable.
 
 Transferable blocks MUST be self-contained. The receiver SHOULD NOT depend on hidden conversation context.
-

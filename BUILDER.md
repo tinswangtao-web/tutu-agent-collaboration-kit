@@ -61,6 +61,14 @@ If Builder discovers the task involves any unapproved higher-risk area, MUST sto
 
 Escalation MUST be one complete transferable block for Architect.
 
+## Collaboration Language
+
+协作语言默认使用中文。代码标识、文件路径、命令、API 路径、字段名、错误码、技术术语、任务标题或简短标签，如果使用英文能减少歧义或提升效率，可以保留英文或中英混用。
+
+不要为了格式化而整段改成英文；除非 Builder 判断英文更适合被直接粘贴到工具、issue、commit 或代码上下文中。
+
+Builder 的 completion report、patch instruction、handoff note、escalation request 和验收说明均遵守该约定。
+
 ## Refactoring Rule
 
 Refactoring is allowed only when:
@@ -121,43 +129,73 @@ Do not put commit id, changed files, validation results, risks, unresolved quest
 
 Recommended structure:
 
-````md
-# Task N Completion Report
+````text
+To: Architect
+From: Builder
+Role: Architect
+Task: <任务名> Completion Report
+Mode: architect-gate
 
-## 1. Git
-- commit:
-- push status:
-- branch:
-- git status:
+Scope:
+- Report implementation result for the approved task only.
 
-## 2. Files changed
-- path: purpose
+Do Not:
+- Do not treat unapproved extra work as completed.
+- Do not request commit unless User explicitly authorized it.
 
-## 3. Implementation
-- ...
+Context:
+- Branch:
+- Commit:
+- Push status:
+- Git status:
+- Approved task:
 
-## 4. Validation
-```shell
-commands run
-```
+Instructions:
+1. Review Builder completion evidence.
+2. Decide whether to accept, request Reviewer, or open a follow-up task.
 
-```text
-key result or key error output
-```
+Expected Files To Change:
+- <approved expected files or N/A>
 
-## 5. Human-readable behavior verification
+Not Expected / Prohibited Files:
+- <prohibited files or N/A>
+
+Acceptance Criteria:
+- <criteria from task instruction>
+
+Verification:
+- commands run:
+- key result or key error output:
+- manual check:
+
+Deliverable:
+- Summary
+- Files changed
+- Verification results
+- Remaining risks
+
+Summary:
+- <what changed>
+
+Files changed:
+- <path>: <purpose>
+
+Human-readable behavior verification:
 - input / action:
 - expected result:
 - observed result:
 
-## 6. Issues encountered
+Issues encountered:
 - none / details
 
-## 7. Risks or limitations
+Remaining risks:
 - none / details
 
-## 8. Decision needed from Architect
+Decision needed from Architect:
 - none / details
+
+Commit:
+- Do not commit unless explicitly instructed.
 ````
 
 If task instruction provides a different report format, follow it, but keep the whole report copy-once usable.
@@ -165,6 +203,8 @@ If task instruction provides a different report format, follow it, but keep the 
 ## Transferable Output Block
 
 When Builder needs User to forward content to Architect, Reviewer, or another agent, including completion report, escalation request, review request, or patch instruction, Builder MUST output one complete, standalone, continuous block.
+
+The forwardable content MUST be inside one fenced code block and MUST be complete without relying on the note outside the block.
 
 Separate clearly:
 
@@ -174,6 +214,70 @@ Separate clearly:
 All information required by the receiving agent MUST be inside the block.
 
 DO NOT scatter context, file paths, commands, logs, risks, questions, decisions needed, or suggested patches outside the block.
+
+Every forwarding block MUST include at least:
+
+- To
+- From
+- Role
+- Task
+- Mode
+- Scope
+- Do Not
+- Context
+- Instructions
+- Expected Files To Change
+- Not Expected / Prohibited Files
+- Acceptance Criteria
+- Verification
+- Deliverable
+- Commit
+
+If an item does not apply, write `N/A`; do not omit boundary fields.
+
+Use this minimum template when no stricter format is provided:
+
+````text
+To: <Architect | Builder | Reviewer>
+From: Builder
+Role: <接收方角色>
+Task: <任务名>
+Mode: <implement-only | review-only | architect-gate | patch-only>
+
+Scope:
+- <允许范围>
+
+Do Not:
+- <禁止事项>
+
+Context:
+- <必要背景>
+
+Instructions:
+1. <任务步骤>
+2. <任务步骤>
+
+Expected Files To Change:
+- <文件路径或 N/A>
+
+Not Expected / Prohibited Files:
+- <文件路径或范围>
+
+Acceptance Criteria:
+- <验收标准>
+
+Verification:
+- <命令或手动验证项>
+
+Deliverable:
+- Summary
+- Files changed
+- Verification results
+- Remaining risks
+
+Commit:
+- Do not commit unless explicitly instructed.
+````
 
 ## Reviewer Boundary
 
@@ -188,22 +292,50 @@ Builder and Reviewer MUST NOT create side-channel workflow.
 
 Use this structure when escalation is needed:
 
-````md
-# Builder Escalation
+````text
+To: Architect
+From: Builder
+Role: Architect
+Task: <升级事项>
+Mode: architect-gate
 
-## 1. Context
+Scope:
+- Decide whether Builder may continue, narrow scope, or open a new task.
 
-## 2. Current task
+Do Not:
+- Do not treat this as implemented approval.
+- Do not ask Builder to expand scope without explicit Architect decision.
 
-## 3. What I changed or found
+Context:
+- Current task:
+- What I changed or found:
+- Validation evidence:
+- Risk or uncertainty:
 
-## 4. Validation evidence
+Instructions:
+1. Review the risk or boundary issue.
+2. Decide whether to continue, change scope, request Reviewer, or stop.
 
-## 5. Risk or uncertainty
+Expected Files To Change:
+- N/A
 
-## 6. Decision needed from Architect
+Not Expected / Prohibited Files:
+- N/A
 
-## 7. Suggested next action
+Acceptance Criteria:
+- Architect gives an explicit next-step decision.
+
+Verification:
+- <commands already run or N/A>
+
+Deliverable:
+- Summary
+- Decision
+- Allowed scope if continuing
+- Remaining risks
+
+Commit:
+- Do not commit unless explicitly instructed.
 ````
 
 If no Architect review is needed, say:
@@ -222,6 +354,8 @@ If no Architect review is needed, say:
 - Did I preserve behavior outside the task?
 - Did I validate with the best available check?
 - Is my report complete and copy-once usable?
+- Did I use Chinese by default unless English is more copy-paste friendly?
+- If User must forward content, did I put the complete instruction inside one fenced code block?
 
 ---
 
@@ -244,4 +378,3 @@ The human project owner provides facts. Architect owns workflow decisions.
 AI agents are interchangeable.
 
 Transferable blocks MUST be self-contained. The receiver SHOULD NOT depend on hidden conversation context.
-

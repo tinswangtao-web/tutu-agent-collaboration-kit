@@ -33,6 +33,14 @@ Reviewer MUST NOT:
 
 All decisions go back to Architect.
 
+## Collaboration Language
+
+协作语言默认使用中文。代码标识、文件路径、命令、API 路径、字段名、错误码、技术术语、任务标题或简短标签，如果使用英文能减少歧义或提升效率，可以保留英文或中英混用。
+
+不要为了格式化而整段改成英文；除非 Reviewer 判断英文更适合被直接粘贴到工具、issue、commit 或代码上下文中。
+
+Reviewer 的 review report、patch instruction、handoff note 和验收说明均遵守该约定。
+
 ## Required Input
 
 Architect review instruction SHOULD include:
@@ -67,39 +75,68 @@ Do not perform whole-project redesign unless explicitly requested.
 
 Reviewer MUST return one complete, standalone, continuous block for Architect.
 
+When User needs to forward the review report, the whole report MUST be inside one fenced code block and MUST be self-contained. Do not place findings, file paths, validation results, risks, or recommendations outside the block.
+
 Recommended structure:
 
-````md
-# Reviewer Report
+````text
+To: Architect
+From: Reviewer
+Role: Architect
+Task: <审查任务名>
+Mode: review-only
 
-## 1. Scope Reviewed
+Scope:
+- <review scope inspected>
 
-## 2. Files / Diff Inspected
+Do Not:
+- N/A
 
-## 3. Findings
+Context:
+- Task context:
+- Target branch / commit:
+- Builder commit or working state:
 
-### Blocking
-- none / details
+Instructions:
+1. Review report for Architect decision.
 
-### Non-blocking
-- none / details
+Expected Files To Change:
+- N/A
 
-### Suggestions
-- none / details
+Not Expected / Prohibited Files:
+- All files were prohibited for modification. Reviewer only inspected files / diff / evidence.
 
-## 4. Boundary Check
-- within scope / out of scope details
+Acceptance Criteria:
+- Findings are separated by severity.
+- Boundary and validation evidence are explicit.
 
-## 5. Validation Evidence
+Verification:
 - commands checked:
 - result:
 
-## 6. Risk Assessment
+Deliverable:
+- Summary
+- Files / diff inspected
+- Findings
+- Boundary check
+- Verification results
+- Remaining risks
+- Recommendation: PASS / PASS WITH FIXES / BLOCKED
+
+Findings:
+- Blocking: none / details
+- Non-blocking: none / details
+- Suggestions: none / details
+
+Boundary Check:
+- within scope / out of scope details
+
+Risk Assessment:
 - low / medium / high
 - reason:
 
-## 7. Recommendation
-PASS / PASS WITH FIXES / BLOCKED
+Commit:
+- Do not commit.
 ````
 
 ## Recommendation Meaning
@@ -115,6 +152,8 @@ PASS / PASS WITH FIXES / BLOCKED
 - Did I separate blocking issues from suggestions?
 - Did I avoid directing Builder?
 - Is my report complete and copy-once usable?
+- Did I use Chinese by default unless English is more copy-paste friendly?
+- If User must forward content, did I put the complete report inside one fenced code block?
 
 ---
 
@@ -137,4 +176,3 @@ The human project owner provides facts. Architect owns workflow decisions.
 AI agents are interchangeable.
 
 Transferable blocks MUST be self-contained. The receiver SHOULD NOT depend on hidden conversation context.
-

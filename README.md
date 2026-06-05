@@ -1,7 +1,7 @@
 # Tutu Agent Collaboration Kit
 
 Status: Stable
-Version: v3.1.2
+Version: v3.1.3
 
 一个面向个人软件项目的轻量 AI 协作规则。目标是让不懂代码的 Project Owner 也能稳定协调多个可替换 AI 进行长期开发。
 
@@ -89,6 +89,77 @@ docs/AI_CONTEXT.md
 
 块外只保留给 User 的简短判断。
 
+## Collaboration Language
+
+协作语言默认使用中文。代码标识、文件路径、命令、API 路径、字段名、错误码、技术术语、任务标题或简短标签，如果使用英文能减少歧义或提升效率，可以保留英文或中英混用。
+
+不要为了格式化而整段改成英文；除非该角色判断英文更适合被直接粘贴到工具、issue、commit 或代码上下文中。
+
+Architect / Builder / Reviewer 的任务单、评审报告、patch instruction、handoff note 和验收说明均遵守该约定。
+
+## One-copy Forwarding
+
+当需要 User 把内容转发给 Architect、Builder、Reviewer 或其他角色时，MUST 提供一个完整、独立、可一键复制的 fenced code block。
+
+转发块之外可以有解释，但真正要转发的内容 MUST 在 fenced code block 内完整自洽，不能依赖块外说明。尤其是给 Builder 的任务单，MUST 避免散落在普通段落里。
+
+给其他角色的转发指令至少包含：
+
+```text
+To: <Architect | Builder | Reviewer>
+From: <User | Architect | Reviewer>
+Role: <接收方角色>
+Task: <任务名>
+Mode: <implement-only | review-only | architect-gate | patch-only>
+
+Scope:
+- <允许范围>
+
+Do Not:
+- <禁止事项>
+
+Context:
+- <必要背景>
+
+Instructions:
+1. <任务步骤>
+2. <任务步骤>
+
+Expected Files To Change:
+- <文件路径或 N/A>
+
+Not Expected / Prohibited Files:
+- <文件路径或范围>
+
+Acceptance Criteria:
+- <验收标准>
+
+Verification:
+- <命令或手动验证项>
+
+Deliverable:
+- Summary
+- Files changed
+- Verification results
+- Remaining risks
+
+Commit:
+- Do not commit unless explicitly instructed.
+```
+
+如果某项不适用，可以写 `N/A`，但不要省略关键边界。
+
+给 Builder 的任务单还 MUST 明确：
+
+- Do not commit，除非任务明确允许。
+- Do not expand scope。
+- Do not modify files outside expected list unless blocked。
+- If blocked, stop and report instead of guessing。
+- Expected files to change。
+- Not expected / prohibited files。
+- Verification commands。
+- Builder 必须返回 summary、files changed、verification results、remaining risks。
+
 ---
 
 ## Design Philosophy
@@ -110,4 +181,3 @@ The human project owner provides facts. Architect owns workflow decisions.
 AI agents are interchangeable.
 
 Transferable blocks MUST be self-contained. The receiver SHOULD NOT depend on hidden conversation context.
-
