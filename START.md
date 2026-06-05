@@ -1,68 +1,130 @@
-# Start / 启动说明
+# Start
 
-## 1. Prepare the Project / 准备项目背景
+## 1. Prepare Context
 
-Before starting, tell Architect the project context in plain language. / 开始前，用自然语言告诉 Architect 项目背景：
+开始前，用自然语言给 Architect 提供最少必要项目背景：
 
-- What the project is / 这个项目是什么
-- Who it is for / 给谁使用
-- What problem it solves / 解决什么问题
-- What should not be done now / 现在明确不做什么
+- 项目是什么
+- 给谁用
+- 当前目标是什么
+- 当前明确不做什么
+- 当前主线 / branch / commit（如适用）
+- Architect 当前能不能读取 repo / files / git diff / logs
+- 是否有 `docs/AI_CONTEXT.md` 或类似项目状态快照
 
-Do not create extra project documents unless the project is long-term and truly needs them. / 除非项目长期维护且确实需要，否则不要额外创建项目文档。
+不要为短期小项目额外创建文档。长期项目 MAY 使用 `docs/AI_CONTEXT.md` 作为短小 project context file。
 
-## 2. Start Architect / 启动 Architect
+## 2. Start Architect
 
-Send this to the Architect session. / 把下面这段发给 Architect 会话：
+发给 Architect：
 
 ```text
-Please read / 请阅读:
+请阅读并遵守：
 
 ARCHITECT.md
 
-You are the Architect for this project. / 你是这个项目的 Architect。
+你是本项目的 Architect。请先根据你是否能真实读取项目 repo / 文件 / git diff / 命令输出，自动选择：
 
-Project context / 项目背景:
-[Describe the project here.]
-[在这里描述项目。]
+- Remote Architect Mode
+- Repo-aware Architect Mode
 
-Your job is to decide Project Fit, Priority, Value / Cost, constraints, and Success Criteria.
-你的职责是判断 Project Fit、Priority、Value / Cost、constraints 和 Success Criteria。
+如果不确定，默认 Remote Architect Mode。
 
-Do not implement. / 不要实现代码。
+Project context:
+[粘贴项目背景，或粘贴 docs/AI_CONTEXT.md 内容]
+
+你的职责：判断 Project Fit、Priority、Value / Cost、Task Risk Level、constraints、Success Criteria，并根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定是否需要 Builder / Reviewer。
+
+User 只提供事实，不负责技术流程判断。
+
+不要实现代码。
 ```
 
-## 3. Start Builder / 启动 Builder
+## 3. Start Builder
 
-Send this to the Builder session. / 把下面这段发给 Builder 会话：
+发给 Builder：
 
 ```text
-Please read / 请阅读:
+请阅读并遵守：
 
 BUILDER.md
 
-You are the Builder for this project. / 你是这个项目的 Builder。
+你是本项目的 Builder。
 
-Only implement approved tasks. / 只实现已经批准的任务。
+Only implement approved tasks.
+不要决定 Project Fit、Priority、architecture direction、dependencies、data model、security、payment、auth 或 persistence。
 
-Do not decide project fit, priority, architecture direction, dependencies, data model, security, payment, auth, or persistence.
-不要决定 project fit、priority、architecture direction、dependencies、data model、security、payment、auth 或 persistence。
+如果发现任务实际风险高于 Architect 标注，MUST stop and escalate。
 
-Do not commit or push unless User explicitly authorizes it. / 除非 User 明确授权，否则不要 commit 或 push。
+除非 User 明确授权，否则不要 commit 或 push。
 ```
 
-## 4. Daily Flow / 日常流转
+## 4. Start Reviewer
+
+只有 Architect 要求时才启动 Reviewer。发给 Reviewer：
 
 ```text
-User -> Architect -> Builder -> User
+请阅读并遵守：
+
+REVIEWER.md
+
+你是 optional Reviewer。你的职责是根据 Architect 的审查指令读取 repo / git diff / changed files / validation evidence，并输出可转发给 Architect 的 review report。
+
+不要改代码。
+不要指挥 Builder。
+不要扩大审查范围。
+不做最终架构决策。
 ```
 
-## 5. Stable Rule / 稳定规则
+## 5. Daily Flow
 
-Do not add new roles, workflows, or documents unless there is a repeated real problem. / 除非出现重复的真实问题，否则不要新增角色、流程或文档。
+默认轻流程：
 
-When Architect gives a task to forward, copy only the complete forwardable instruction block. / 当 Architect 给出可转发任务指令时，只复制完整的可转发指令块。
+```text
+User → Architect → Builder → Architect review → User
+```
 
-When Builder asks User to forward content to Architect, Codex, or Reviewer, copy only the complete forwardable output block. / 当 Builder 要求 User 转发内容给 Architect、Codex 或 Reviewer 时，只复制完整的可转发输出块。
+需要独立代码审查时：
 
-Builder completion reports should also be written as one complete block when they will be reviewed by Architect. / Builder 完成报告如果要交给 Architect 审查，也应写成一个完整块。
+```text
+User → Architect → Builder → Reviewer → Architect → User
+```
+
+## 6. Session Checklist
+
+Architect 每次任务开始前 SHOULD 确认：
+
+1. `Architect Access Mode`：Remote or Repo-aware。
+2. `Task Risk Level`：Level 1 / 2 / 3 / 4。
+3. 是否需要 `Reviewer`，以及 Reviewer 需要什么 capability。
+4. 是否需要读取或更新 `Project Context File`；新项目可参考 `PROJECT_CONTEXT_TEMPLATE.md`。
+5. 是否已使用完整 `Transferable Block`。
+
+## 7. Stable Rule
+
+不要新增角色、流程或文档，除非它解决重复出现的真实问题。
+
+Reviewer 是 optional，不是第三个常驻角色。是否启用 Reviewer 由 Architect 根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定。
+
+---
+
+## Design Philosophy
+
+This protocol describes roles and capabilities, not specific AI products.
+
+Core priorities:
+
+1. Correctness
+2. Transparency
+3. Human Control
+4. Efficiency
+5. Token Cost
+
+Never trade correctness for token savings.
+
+The human project owner provides facts. Architect owns workflow decisions.
+
+AI agents are interchangeable.
+
+Transferable blocks MUST be self-contained. The receiver SHOULD NOT depend on hidden conversation context.
+

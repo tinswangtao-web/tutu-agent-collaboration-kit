@@ -1,19 +1,113 @@
 # Tutu Agent Collaboration Kit
 
 Status: Stable
-Version: v3.0.3
+Version: v3.1.2
 
-A minimal AI collaboration framework for personal software projects.
-一个面向个人软件项目的极简 AI 协作框架。
+一个面向个人软件项目的轻量 AI 协作规则。目标是让不懂代码的 Project Owner 也能稳定协调多个可替换 AI 进行长期开发。
 
-## Files / 文件
+默认主线：
 
-- `START.md`: How to start. / 如何启动。
-- `ARCHITECT.md`: Architect rules. / Architect 规则。
-- `BUILDER.md`: Builder rules. / Builder 规则。
+```text
+User → Architect → Builder → Architect review → User
+```
 
-## Roles / 角色
+当任务风险较高、Architect 无法直接读取 repo，或代码级证据不足时，Architect 可以按需启用 Reviewer：
 
-- Architect decides. / Architect 决策。
-- Builder implements. / Builder 实现。
-- User authorizes. / User 授权。
+```text
+User → Architect → Builder → Reviewer → Architect → User
+```
+
+核心原则：
+
+```text
+默认轻流程；按能力和风险逐级加审查。
+```
+
+## Files
+
+- `START.md`：启动方式与日常流程。
+- `ARCHITECT.md`：Architect 规则、Access Mode、Task Risk Level、handoff。
+- `BUILDER.md`：Builder 执行、验证、报告与升级规则。
+- `REVIEWER.md`：optional repo-aware 审查角色规则。
+- `PROJECT_CONTEXT_TEMPLATE.md`：具体项目状态快照模板。
+
+## Roles
+
+### Primary roles
+
+- `Architect`：决策、拆任务、定边界、判断流程、最终验收。
+- `Builder`：执行已批准的实现任务。
+- `User`：提供事实、转发信息、最终授权 commit / push / release / irreversible actions。
+
+### Optional support
+
+- `Reviewer`：按 Architect 要求进行独立审查，通常需要 repo / diff / file access。Reviewer 不是常驻角色，不做最终架构决策，不直接指挥 Builder，不擅自改代码。
+
+## Operating Model
+
+### Architect Access Mode
+
+Architect 每次会话或任务开始时，MUST 根据实际 repo access 判断模式：
+
+- `Remote Architect Mode`：不能直接读取本地 repo、文件、git diff 或命令输出。
+- `Repo-aware Architect Mode`：可以直接读取 repo、查看代码 / diff。
+
+如果不确定，默认 `Remote Architect Mode`。
+
+### Task Risk Level
+
+Architect MUST 在 handoff 前判断任务风险等级，并根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定是否启用 Reviewer。
+
+| Level | Typical tasks | Reviewer |
+|---|---|---|
+| Level 1 Low-risk | docs / comments / formatting | No |
+| Level 2 Normal | simple API / small service / small infra | Optional |
+| Level 3 High-risk | multi-file business logic / core flow | Recommended when Architect lacks repo confidence |
+| Level 4 Critical | schema / migration / auth / permission / ledger / security / production data risk | Strongly recommended / required when Architect lacks repo confidence |
+
+## Project Context File
+
+长期项目 MAY 维护短小状态快照，例如：
+
+```text
+docs/AI_CONTEXT.md
+```
+
+它只记录项目状态，不复制本规则。Remote Architect 无法读本地文件时，User 可以把该文件内容粘贴进新会话。
+
+具体项目知识，例如业务实体、技术栈、数据库、模块边界、当前任务状态，应该写入 `AI_CONTEXT.md`，不要写入本协议主体。
+
+## Transferable Blocks
+
+所有跨 AI 交接内容 MUST 是完整、独立、连续、可一次复制的 block，包括：
+
+- Architect → Builder task instruction
+- Architect → Reviewer review instruction
+- Builder → Architect completion report
+- Builder → Architect escalation request
+- Reviewer → Architect review report
+
+块外只保留给 User 的简短判断。
+
+---
+
+## Design Philosophy
+
+This protocol describes roles and capabilities, not specific AI products.
+
+Core priorities:
+
+1. Correctness
+2. Transparency
+3. Human Control
+4. Efficiency
+5. Token Cost
+
+Never trade correctness for token savings.
+
+The human project owner provides facts. Architect owns workflow decisions.
+
+AI agents are interchangeable.
+
+Transferable blocks MUST be self-contained. The receiver SHOULD NOT depend on hidden conversation context.
+
