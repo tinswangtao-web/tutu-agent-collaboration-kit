@@ -18,6 +18,18 @@
 - Current source of truth:
 - Current milestone / phase:
 
+## Product State
+
+- Goal:
+- Target user:
+- Workflow:
+- MVP:
+- Current milestone:
+- Next milestone:
+- Completed modules:
+- Unfinished modules:
+- Not Now:
+
 ## Completed Tasks
 
 - <Task name>: <short result, date or commit if useful>
@@ -51,8 +63,9 @@
 
 - Keep this file short, ideally under 100 lines.
 - Update at Task close when Architect requires it.
-- Record durable current state, accepted decisions, risks, and concise completed-task entries.
+- Record durable current state, Product State, accepted decisions, risks, and concise completed-task entries.
 - Do not turn this into a changelog, command log, chat transcript, or second collaboration rule file.
+- Keep product spec details in `PROJECT_SPEC.md` / `FEATURE_SPEC.md`; keep only the current product snapshot here.
 - `Suggested Next Direction` is not a formal Task Card and does not authorize Builder work.
 
 ## Session Handoff Rule

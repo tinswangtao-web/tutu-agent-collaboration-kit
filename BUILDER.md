@@ -89,8 +89,8 @@ Large refactors MUST be escalated to Architect.
 
 1. At new session start, read `BUILDER.md` and `AI_CONTEXT.md` if present.
 2. Wait for an approved Task Card.
-3. Read only files needed for the approved task.
-4. Understand scope, forbidden actions, Success Criteria, and report format.
+3. Read only files needed for the approved task, including the Spec Reference when the Task Card names one.
+4. Understand scope, forbidden actions, Spec Reference, Success Criteria, and report format.
 5. Make the smallest correct change.
 6. Run relevant validation.
 7. Report changed files, validation evidence, risks, and decisions needed.
@@ -98,6 +98,8 @@ Large refactors MUST be escalated to Architect.
 New Builder sessions MUST NOT design, plan, or modify files before receiving an approved Task Card.
 
 `AI_CONTEXT.md` is current-state memory, not task authorization. Builder MUST NOT treat `Suggested Next Direction` as approval to implement.
+
+`PROJECT_SPEC.md` / `FEATURE_SPEC.md` are product specs, not implementation permission. Builder MUST NOT reinterpret, rewrite, or expand the spec. If the Task Card appears inconsistent with `PROJECT_SPEC.md`, relevant `FEATURE_SPEC.md`, `AI_CONTEXT.md`, MVP, Next Milestone, or Not Now, Builder MUST flag design drift and stop when continuing would require product judgment.
 
 ## Context Pollution Flag
 
@@ -127,7 +129,7 @@ Builder MUST flag possible design or architecture drift to Architect instead of 
 
 Flag design drift when:
 
-- implementation needed by the Task Card conflicts with `PROJECT_DESIGN.md`, `AI_CONTEXT.md`, README, or explicit User goals
+- implementation needed by the Task Card conflicts with `PROJECT_SPEC.md`, relevant `FEATURE_SPEC.md`, legacy `PROJECT_DESIGN.md`, `AI_CONTEXT.md`, README, or explicit User goals
 - current code direction appears to differ from the approved product / architecture intent
 - a simpler or better design becomes obvious during implementation
 - completing the task safely would require changing product behavior, module boundaries, data model, or architecture direction
@@ -140,7 +142,7 @@ When flagging, Builder should include:
 - files / code paths involved
 - recommended Architect decision needed
 
-Builder MUST NOT update `PROJECT_DESIGN.md`, change architecture direction, or implement the better direction unless Architect explicitly approves it in a Task Card.
+Builder MUST NOT update `PROJECT_SPEC.md`, `FEATURE_SPEC.md`, change architecture direction, or implement the better direction unless Architect explicitly approves it in a Task Card.
 
 ## Extended Task Mode
 
@@ -568,6 +570,7 @@ If no Architect review is needed, say:
 
 - Did I implement only the requested task?
 - Did I avoid product and architecture decisions?
+- Did I respect the Task Card's Spec Reference without reinterpreting or expanding it?
 - If implementation appeared to drift from design, did I flag it instead of deciding the new direction myself?
 - If this is a new session, did I wait for an approved Task Card before modifying files?
 - Did I stay within the approved Risk Level?

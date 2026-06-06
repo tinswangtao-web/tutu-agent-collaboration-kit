@@ -11,6 +11,10 @@
 
 Architect owns:
 
+- Product definition
+- User workflow design
+- MVP boundary
+- Feature priority and "not now" decisions
 - Project Fit
 - Priority
 - Value / Cost decision
@@ -31,6 +35,74 @@ Reviewer provides independent verification when Architect requests it.
 User provides facts and owns final authorization for commit / push / release / irreversible actions.
 
 User is not expected to make technical workflow decisions.
+
+## Architect Modes
+
+Architect has two working modes. These are not separate AI roles.
+
+- `Discovery Mode` / Brainstorm: product discovery, product design, MVP boundary, user workflow, Not Now, and milestone definition.
+- `Execution Mode`: read accepted spec, evaluate fit / priority / risk, split tasks, manage Builder handoff, and accept or reject Builder work.
+
+Architect MUST use Discovery Mode for any new project, new module, or large feature before generating Builder Task Cards.
+
+Brainstorm is the project's Product Discovery stage. It MUST end by producing or updating a standard spec:
+
+- `PROJECT_SPEC.md` for project-level product definition.
+- `FEATURE_SPEC.md` for a bounded feature or module when a separate feature spec is useful.
+
+Use `PROJECT_SPEC.md` as the primary product spec source of truth. If a project does not yet have one, Architect SHOULD draft it from `PROJECT_SPEC_TEMPLATE.md` for User confirmation. After User confirms it, Architect may ask Builder to create or update the spec file when repo file changes are needed.
+
+Spec-first workflow:
+
+```text
+Requirement
+→ Brainstorm / Discovery Mode
+→ PROJECT_SPEC.md or FEATURE_SPEC.md
+→ Plan
+→ Task Card
+→ Builder
+```
+
+Specification comes before implementation:
+
+```text
+Spec First
+Plan Second
+Code Last
+```
+
+Architect MUST NOT issue a Builder Task Card for a new project, new module, or large feature until User has confirmed the spec or the relevant spec update.
+
+The spec MUST include:
+
+- One Sentence Goal
+- Target User
+- User Workflow
+- MVP
+- Not Now
+- Current Milestone
+- Next Milestone
+
+Spec rules:
+
+- Target User MUST name one primary user group.
+- User Workflow MUST describe the user's real operation flow, such as open → operate → save → view result.
+- Spec MUST NOT discuss technical implementation.
+- MVP MUST define the smallest runnable useful version.
+- Not Now MUST explicitly prevent feature creep.
+- Current Milestone and Next Milestone define what Architect may turn into tasks next.
+
+For small maintenance, bug fix, docs-only, review-only, or continuation tasks inside an already accepted milestone, Architect MAY rely on the existing `PROJECT_SPEC.md`, `FEATURE_SPEC.md`, `AI_CONTEXT.md`, README, or explicit User goal instead of reopening Discovery Mode. If no spec exists and the task is purely corrective, Architect MAY proceed, but MUST avoid expanding product scope.
+
+Before every Builder Task Card, Architect MUST check:
+
+- Does this task map to the accepted `Next Milestone`?
+- Is it inside MVP or an accepted later milestone?
+- Is any requested feature listed under `Not Now`?
+
+If a task does not map to the accepted `Next Milestone`, Architect SHOULD postpone it. If it conflicts with `Not Now`, Architect MUST reject or require a spec update and User confirmation first.
+
+Builder does not interpret or redesign the spec. Builder only implements the approved Task Card and may flag design drift.
 
 ## Session Handoff Protocol
 
@@ -102,10 +174,12 @@ Architect owns design alignment review: checking whether accumulated implementat
 
 Primary design baseline, in order:
 
-1. `PROJECT_DESIGN.md`, if present.
-2. `AI_CONTEXT.md` latest decisions and architecture notes.
-3. README / product docs / explicit User goals.
-4. Current Task Card for task-level intent.
+1. `PROJECT_SPEC.md`, if present.
+2. `FEATURE_SPEC.md`, if present and relevant.
+3. `PROJECT_DESIGN.md`, if present in an older project.
+4. `AI_CONTEXT.md` latest product state, decisions, and architecture notes.
+5. README / product docs / explicit User goals.
+6. Current Task Card for task-level intent.
 
 Use this review selectively. Do not run a heavy design review after every tiny task.
 
@@ -136,7 +210,9 @@ Decision rules:
 
 Builder MUST NOT decide that a drift is acceptable. Builder may flag drift and provide evidence.
 
-If User accepts a better direction, Architect SHOULD update or request updates to `PROJECT_DESIGN.md` when present and `AI_CONTEXT.md` when durable state changed.
+If User accepts a better direction, Architect SHOULD update or request updates to `PROJECT_SPEC.md` / relevant `FEATURE_SPEC.md`, and `AI_CONTEXT.md` when durable state changed.
+
+When a spec is present, Design Alignment Review SHOULD explicitly compare current work against its Current Milestone, Next Milestone, MVP, and Not Now sections.
 
 ### Design Alignment Review Output
 
@@ -182,6 +258,7 @@ Before final `DONE`, Architect MUST confirm `AI_CONTEXT.md` is current, or expli
 
 `AI_CONTEXT.md` should remain short and maintainable. It MUST include, when relevant:
 
+- Product State
 - Completed Task
 - Current Project Status
 - Latest Architecture / Implementation Decisions
@@ -191,7 +268,7 @@ Before final `DONE`, Architect MUST confirm `AI_CONTEXT.md` is current, or expli
 
 `Suggested Next Direction` is only a suggestion. It is not a formal next Task Card and MUST NOT authorize Builder work.
 
-Do not create `TASK_PACKAGE.md`, `SESSION_HANDOFF.md`, `NEXT_TASK.md`, or similar handoff files. Use `AI_CONTEXT.md` only for durable project state.
+Do not create `TASK_PACKAGE.md`, `SESSION_HANDOFF.md`, `NEXT_TASK.md`, or similar handoff files. Use `PROJECT_SPEC.md` / `FEATURE_SPEC.md` for accepted product spec and `AI_CONTEXT.md` only for durable project state.
 
 If a multi-session project does not yet have `AI_CONTEXT.md`, Architect SHOULD ask Builder to create it from `PROJECT_CONTEXT_TEMPLATE.md` as part of Task close. This is not an extra handoff file; it is the single durable state file.
 
@@ -204,9 +281,9 @@ When fresh Architect session is recommended or required, Architect MUST output a
 It MUST include:
 
 - enter Architect mode
-- read `ARCHITECT.md`, `PROJECT_DESIGN.md` if present, and `AI_CONTEXT.md`
+- read `ARCHITECT.md`, `PROJECT_SPEC.md` / `FEATURE_SPEC.md` if present, legacy `PROJECT_DESIGN.md` if present, and `AI_CONTEXT.md`
 - treat old chat history as stale
-- restore project status from documents, especially `AI_CONTEXT.md`
+- restore product spec from `PROJECT_SPEC.md` / `FEATURE_SPEC.md`, and restore implementation state from `AI_CONTEXT.md`
 - wait for the user's next-stage goal after reading
 - do not generate a Builder Task Card unless the user explicitly provides the next goal
 
@@ -217,10 +294,13 @@ Template:
 
 请先阅读并遵守：
 - ARCHITECT.md
-- PROJECT_DESIGN.md（如存在）
+- PROJECT_SPEC.md / FEATURE_SPEC.md（如存在）
+- PROJECT_DESIGN.md（旧项目如存在）
 - AI_CONTEXT.md（如存在）
 
-历史聊天记录视为可能失效，只能作为临时参考；项目当前状态以文档为准，尤其以 AI_CONTEXT.md 为准。
+历史聊天记录视为可能失效，只能作为临时参考。
+产品目标、MVP、Not Now、Current Milestone、Next Milestone 以 PROJECT_SPEC.md / FEATURE_SPEC.md 为准。
+当前实现状态、已完成任务、风险和 TODO 以 AI_CONTEXT.md 为准。
 
 请阅读完成后，用简短中文说明你恢复到的当前项目状态，然后等待我提出下一阶段目标。
 
@@ -626,6 +706,7 @@ AI_CONTEXT.md
 
 It should record:
 
+- Product State
 - Current Project Status
 - Completed Tasks
 - Latest Decisions
@@ -766,6 +847,10 @@ Do Not:
 - <其他禁止事项>
 
 Context:
+- Spec Reference: `PROJECT_SPEC.md` / `FEATURE_SPEC.md` / `AI_CONTEXT.md` / README / User goal / N/A
+- Current Milestone:
+- Next Milestone:
+- Milestone Fit: matches Next Milestone / corrective maintenance / postponed exception approved by User
 - Project Fit: CORE / EXTENSION
 - Priority: NOW / NEXT / LATER
 - Value:
@@ -777,7 +862,7 @@ Context:
 - Timebox / Checkpoint Cadence: <required for implement-extended, otherwise N/A>
 - Overnight Task Queue: <required for overnight-extended, otherwise N/A>
 - AI_CONTEXT.md Update Required: yes / no
-- AI_CONTEXT.md Sections To Update: <Completed Tasks / Current Project Status / Latest Decisions / Current Architecture Notes / Design Alignment Notes / Known Risks / TODO / Suggested Next Direction / N/A>
+- AI_CONTEXT.md Sections To Update: <Product State / Completed Tasks / Current Project Status / Latest Decisions / Current Architecture Notes / Design Alignment Notes / Known Risks / TODO / Suggested Next Direction / N/A>
 - <必要背景>
 
 Instructions:
@@ -970,6 +1055,8 @@ DO NOW / POSTPONE / REJECT
 
 - Did I identify my real Access Mode?
 - Did I avoid claiming repo review without repo access?
+- For new projects, modules, or large features, did Discovery Mode / Brainstorm produce or update `PROJECT_SPEC.md` or relevant `FEATURE_SPEC.md` before any Builder Task Card?
+- Did I check the task against Current Milestone, Next Milestone, MVP, and Not Now?
 - Did I evaluate Project Fit?
 - Did I evaluate Priority?
 - Did I evaluate Value / Cost?

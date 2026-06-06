@@ -1,14 +1,14 @@
 # Tutu Agent Collaboration Kit
 
 Status: Stable
-Version: 3.2.1
+Version: 4.0.1
 
 一个面向个人软件项目的轻量 AI 协作规则。目标是让不懂代码的 Project Owner 也能稳定协调多个可替换 AI 进行长期开发。
 
-默认主线：
+默认主线从 Task Driven 升级为 Spec Driven：
 
 ```text
-User → Architect → Builder → Architect review → User
+Brainstorm / Architect Discovery Mode → PROJECT_SPEC.md → Architect Execution Mode → Builder Task Card → Builder → Architect review → User
 ```
 
 低风险小任务可以继续当前会话。独立阶段、高风险任务、长任务、过夜任务、复杂 resume 或上下文明显变脏时，推荐或要求开启新的 Architect 会话和新的 Builder 会话：
@@ -26,8 +26,10 @@ User → Architect → Builder → Reviewer → Architect → User
 核心原则：
 
 ```text
+Spec First；Plan Second；Code Last。
 默认轻流程；按能力和风险逐级加审查。
-AI_CONTEXT.md 只记录长期状态变化；聊天记录只是临时缓存。
+PROJECT_SPEC.md 记录产品规格；AI_CONTEXT.md 只记录长期状态变化。
+聊天记录只是临时缓存。
 ```
 
 ## Files
@@ -36,6 +38,7 @@ AI_CONTEXT.md 只记录长期状态变化；聊天记录只是临时缓存。
 - `ARCHITECT.md`：Architect 规则、Access Mode、Task Risk Level、handoff。
 - `BUILDER.md`：Builder 执行、验证、报告与升级规则。
 - `REVIEWER.md`：optional repo-aware 审查角色规则。
+- `PROJECT_SPEC_TEMPLATE.md`：Brainstorm / Discovery Mode 输出的 `PROJECT_SPEC.md` 模板。
 - `PROJECT_CONTEXT_TEMPLATE.md`：`AI_CONTEXT.md` 项目状态快照模板。
 
 ## Roles
@@ -71,7 +74,9 @@ Architect SHOULD periodically run a lightweight Design Alignment Review after se
 
 Design baseline, in order:
 
-- `PROJECT_DESIGN.md`, if present
+- `PROJECT_SPEC.md`, if present
+- `FEATURE_SPEC.md`, if present and relevant
+- `PROJECT_DESIGN.md`, if present in an older project
 - `AI_CONTEXT.md` latest decisions and architecture notes
 - README / product docs / explicit User goals
 - current Task Card
@@ -85,6 +90,29 @@ Possible outcomes:
 Builder may flag design drift, but Architect owns the review and User confirms accepted direction changes.
 
 ## Operating Model
+
+### Architect Discovery / Execution Modes
+
+Architect 只有一个角色，但有两个工作状态：
+
+- `Discovery Mode` / Brainstorm：产品发现、用户流程、MVP、Not Now、Current Milestone、Next Milestone。
+- `Execution Mode`：读取 Spec、拆分 Task、管理 Milestone、验收 Builder。
+
+任何新项目、新模块或大功能开始前，Architect MUST 先进入 Discovery Mode / Brainstorm，创建或更新 `PROJECT_SPEC.md` 或相关 `FEATURE_SPEC.md`，并等待 User 确认后再生成 Builder Task Card。
+
+`PROJECT_SPEC.md` 是产品 spec source of truth，至少包含：
+
+- One Sentence Goal
+- Target User
+- User Workflow
+- MVP
+- Not Now
+- Current Milestone
+- Next Milestone
+
+Architect 每次生成 Task Card 前 MUST 检查该任务是否对应 `Next Milestone`，是否仍在 MVP / accepted milestone 内，是否触碰 `Not Now`。不匹配的任务应该延期；冲突的任务必须拒绝或先更新 spec 并获得 User 确认。
+
+Builder 不负责理解或重写产品 spec，只执行带有 Spec Reference 的 approved Task Card。
 
 ### Architect Access Mode
 
@@ -160,14 +188,16 @@ Builder modes include:
 AI_CONTEXT.md
 ```
 
-它只记录项目状态，不复制本规则。Remote Architect 无法读本地文件时，User 可以把该文件内容粘贴进新会话。
+它只记录项目状态，不复制本规则，也不替代 `PROJECT_SPEC.md`。Remote Architect 无法读本地文件时，User 可以把该文件内容粘贴进新会话。
 
-具体项目知识，例如业务实体、技术栈、数据库、模块边界、当前任务状态，应该写入 `AI_CONTEXT.md`，不要写入本协议主体。
+产品 spec、MVP、Not Now、Current Milestone、Next Milestone 应该写入 `PROJECT_SPEC.md` 或相关 `FEATURE_SPEC.md`。具体项目知识，例如业务实体、技术栈、数据库、模块边界、当前任务状态，应该写入 `AI_CONTEXT.md`，不要写入本协议主体。
 
 推荐结构：
 
 ```md
 # AI_CONTEXT
+
+## Product State
 
 ## Current Project Status
 

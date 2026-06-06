@@ -8,11 +8,12 @@
 - 给谁用
 - 当前目标是什么
 - 当前明确不做什么
+- 是否已有 `PROJECT_SPEC.md` / `FEATURE_SPEC.md`
 - 当前主线 / branch / commit（如适用）
 - Architect 当前能不能读取 repo / files / git diff / logs
 - 是否有 `AI_CONTEXT.md` 或类似项目状态快照
 
-不要为短期小项目额外创建文档。长期项目 SHOULD 使用 `AI_CONTEXT.md` 作为短小 project context file。
+不要为短期小项目额外创建文档。长期项目、新模块或大功能 SHOULD 先通过 Brainstorm / Architect Discovery Mode 生成 `PROJECT_SPEC.md` 或相关 `FEATURE_SPEC.md`，并使用 `AI_CONTEXT.md` 作为短小 project context file。
 
 ## 2. Start Architect
 
@@ -31,11 +32,13 @@ ARCHITECT.md
 如果不确定，默认 Remote Architect Mode。
 
 Project context:
-[粘贴项目背景，或粘贴 AI_CONTEXT.md 内容]
+[粘贴项目背景，或粘贴 PROJECT_SPEC.md / FEATURE_SPEC.md / AI_CONTEXT.md 内容]
 
-历史聊天记录只作为临时缓存；如果存在 AI_CONTEXT.md，项目当前状态以 AI_CONTEXT.md 为准。
+历史聊天记录只作为临时缓存；如果存在 PROJECT_SPEC.md / FEATURE_SPEC.md，产品 spec 以这些文件为准；如果存在 AI_CONTEXT.md，项目当前状态以 AI_CONTEXT.md 为准。
 
-你的职责：判断 Project Fit、Priority、Value / Cost、Task Risk Level、constraints、Success Criteria，并根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定是否需要 Builder / Reviewer。阶段结束、多个相关任务完成、long / overnight task 后，或发现方向可能偏离时，执行轻量 Design Alignment Review。
+你的职责：先判断是否需要 Brainstorm / Discovery Mode。任何新项目、新模块或大功能开始前，必须先创建或更新 PROJECT_SPEC.md 或相关 FEATURE_SPEC.md，并等 User 确认后，才允许进入 Execution Mode 生成 Builder Task Card。之后再判断 Project Fit、Priority、Value / Cost、Task Risk Level、constraints、Success Criteria，并根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定是否需要 Builder / Reviewer。阶段结束、多个相关任务完成、long / overnight task 后，或发现方向可能偏离时，执行轻量 Design Alignment Review。
+
+每次生成 Builder Task Card 前，必须检查 Task 是否对应 PROJECT_SPEC.md / FEATURE_SPEC.md 的 Current Milestone / Next Milestone，是否在 MVP 或已接受 milestone 内，是否触碰 Not Now。Task Card 必须包含 Spec Reference、Current Milestone、Next Milestone 和 Milestone Fit。
 
 User 可以表达 short task / extended task / overnight task（过夜任务）的偏好，但你必须把它视为偏好而不是自动批准。最终 Builder Mode 由你根据 scope clarity、risk、expected / prohibited files、verification clarity 和 resume safety 决定。
 
@@ -76,7 +79,7 @@ Only implement approved tasks.
 
 如果你发现 Task Card、当前批准范围、git diff、验证状态或聊天上下文变得不清楚，必须在 report 中加入 context pollution flag，建议 Architect 判断是否需要新会话；不要自行规划下一任务或自行重置流程。
 
-如果你发现实现方向可能偏离 PROJECT_DESIGN.md、AI_CONTEXT.md、README 或用户明确目标，必须在 report 中加入 design drift flag；不要自行接受新方向、重写设计或扩大实现。
+如果你发现实现方向可能偏离 PROJECT_SPEC.md、FEATURE_SPEC.md、AI_CONTEXT.md、README 或用户明确目标，必须在 report 中加入 design drift flag；不要自行接受新方向、重写设计或扩大实现。
 
 除非 User 明确授权，否则不要 commit 或 push。
 
@@ -135,15 +138,16 @@ Architect 每次任务开始或关闭时 SHOULD 确认：
 3. `Task Granularity`：short task / extended task / overnight task / Architect decides。
 4. `Builder Mode`：implement-only / implement-extended / overnight-extended / implement-extended-resume / patch-only。
 5. 是否需要 `Reviewer`，以及 Reviewer 需要什么 capability。
-6. 是否需要读取或更新 `Project Context File`；新项目可参考 `PROJECT_CONTEXT_TEMPLATE.md`。
-7. 是否已使用完整 `Transferable Block`。
-8. 是否默认使用中文，并把所有需要转发的内容放进完整 fenced code block。
-9. extended task 是否包含 timebox、checkpoint cadence、resume instruction 和 stop conditions。
-10. Level 4 是否已避免使用 extended task / overnight task。
-11. overnight task 是否包含有限 task queue、每项 acceptance / verification、最大无人值守时长、morning review instruction。
-12. Task close 时是否完成 Task Close Review、AI_CONTEXT.md update requirement、session decision。
-13. 如果建议或要求新会话，是否输出 Next Architect Session Starter、Next Builder Session Starter。
-14. 是否需要 Design Alignment Review；尤其是多个相关任务后、阶段边界、long / overnight task 后、Builder flag drift 后。
+6. 是否需要 Brainstorm / Discovery Mode；新项目、新模块或大功能可参考 `PROJECT_SPEC_TEMPLATE.md`。
+7. 是否需要读取或更新 `Project Context File`；新项目可参考 `PROJECT_CONTEXT_TEMPLATE.md`。
+8. 是否已使用完整 `Transferable Block`。
+9. 是否默认使用中文，并把所有需要转发的内容放进完整 fenced code block。
+10. extended task 是否包含 timebox、checkpoint cadence、resume instruction 和 stop conditions。
+11. Level 4 是否已避免使用 extended task / overnight task。
+12. overnight task 是否包含有限 task queue、每项 acceptance / verification、最大无人值守时长、morning review instruction。
+13. Task close 时是否完成 Task Close Review、AI_CONTEXT.md update requirement、session decision。
+14. 如果建议或要求新会话，是否输出 Next Architect Session Starter、Next Builder Session Starter。
+15. 是否需要 Design Alignment Review；尤其是多个相关任务后、阶段边界、long / overnight task 后、Builder flag drift 后。
 
 ## 7. Stable Rule
 
@@ -151,7 +155,7 @@ Architect 每次任务开始或关闭时 SHOULD 确认：
 
 Reviewer 是 optional，不是第三个常驻角色。是否启用 Reviewer 由 Architect 根据 Access Mode、Task Risk Level、confidence level 和 User constraints 决定。
 
-不要新增 `TASK_PACKAGE.md`、`SESSION_HANDOFF.md`、`NEXT_TASK.md` 等额外 handoff 文件。跨会话长期状态只写入 `AI_CONTEXT.md`。
+不要新增 `TASK_PACKAGE.md`、`SESSION_HANDOFF.md`、`NEXT_TASK.md` 等额外 handoff 文件。产品 spec 写入 `PROJECT_SPEC.md` / `FEATURE_SPEC.md`；跨会话长期状态只写入 `AI_CONTEXT.md`。
 
 ---
 
