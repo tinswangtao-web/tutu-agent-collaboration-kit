@@ -296,7 +296,7 @@ Only omit one if User explicitly asked for only one.
 
 Both starters must be complete, standalone, continuous, and copy-once usable.
 
-The Builder Starter must not authorize implementation by itself unless the Architect is also intentionally issuing a Work Package / Task Card in the same closeout. If no next work is authorized yet, Builder Starter must say: wait for Architect Work Package / Task Card.
+The Builder Starter must not authorize implementation by itself unless the Architect is also intentionally issuing a Work Package (Outcome) in the same closeout. If no next work is authorized yet, Builder Starter must say: wait for Architect Work Package. Builder Task Card (Execution) is generated inside the Builder session from the Work Package, not embedded by Architect.
 ````
 
 ### Next Architect Session Starter
@@ -317,7 +317,7 @@ Output when fresh session is recommended or required.
 历史聊天记录视为可能失效，只能作为临时参考。
 
 请先恢复项目状态，然后等待我提供下一步目标。
-不要直接生成 Builder Work Package / Task Card，除非我明确提出下一步需求。
+不要直接生成 Builder Task Card（Execution 步骤），除非我明确提出下一步需求。Work Package (Outcome) 由 Architect 定义；Local Plan 与 Builder Task Card (Execution) 由 Builder 自主生成（Delegate outcomes, not steps）。
 不要把 AI_CONTEXT.md 的 Suggested Next Direction 当成正式任务；它只能作为讨论方向。
 ````
 
@@ -340,12 +340,13 @@ Required files to read:
 Source of truth:
 - Current implementation state: AI_CONTEXT.md and current files.
 - Product goal / MVP / Not Now / Milestone: PROJECT_SPEC.md / FEATURE_SPEC.md when named as Spec Reference.
-- This Builder Starter is execution context only unless Architect intentionally includes a Work Package / Task Card in this same closeout.
-- If no Work Package / Task Card is included, Builder must restore repo state and wait for Architect authorization.
+- This Builder Starter is execution context only unless Architect intentionally includes a Work Package (Outcome) in this same closeout.
+- If no Work Package is included, Builder must restore repo state and wait for Architect authorization.
+- Upon receiving a Work Package, Builder autonomously generates its Local Plan and Builder Task Card (Execution) before any implementation.
 - Chat history is temporary reference only.
 
 Current work:
-- <具体下一步执行工作, or: No work authorized yet. Wait for Architect Work Package / Task Card.>
+- <Architect 提供的 Work Package (Outcome), or: No work authorized yet. Wait for Architect Work Package.>
 
 Scope:
 - <允许范围>
