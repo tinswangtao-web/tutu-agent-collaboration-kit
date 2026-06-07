@@ -49,6 +49,7 @@ Brainstorm / Architect Discovery Mode
 
 Do not load every rule for every task.
 
+- Every new session must reread the minimum role rules from current files. Do not rely on a previous chat's memory of the rules.
 - Always-On Core: role boundary, source of truth, Task Card, DONE, commit / push gate.
 - Conditional Rules: read only when triggered by Discovery, Spec Quality Gate, Strict Gate, extended / overnight, Reviewer, closeout handoff, or commit-boundary work.
 - Templates: read `TEMPLATES.md` only when generating the matching copy-once block.

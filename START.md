@@ -36,6 +36,7 @@ Source of truth:
 - 聊天记录只是临时缓存。
 
 Minimal context:
+- 新会话必须重新读取当前文件中的最小角色规则，不依赖旧聊天对规则的记忆。
 - 默认只读取 ARCHITECT.md 的 Always-On Core 与当前触发的 Conditional Rules。
 - Discovery Mode 读取用户规则、产品输入和已有 Spec。
 - Execution Mode 读取 relevant Spec、AI_CONTEXT.md 和当前 User goal。
@@ -73,6 +74,7 @@ Minimal context:
 你是本项目的 Builder。
 
 Minimal context:
+- 新会话必须重新读取当前文件中的最小角色规则，不依赖旧聊天对规则的记忆。
 - 默认只读取 BUILDER.md 的 Always-On Core 与当前 Task Card 触发的 Conditional Rules。
 - 读取 AI_CONTEXT.md（如存在）。
 - 等待 Architect 提供 Task Card，或等待 User 明确触发 Nano 任务。
