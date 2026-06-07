@@ -61,7 +61,8 @@
 
 ## Update Rule
 
-- Keep this file short, ideally under 100 lines.
+- Keep this file short. Aim for under 100 lines; allow up to 150 for complex projects.
+- When Completed Tasks exceeds 10 items, move older entries into `## Completed Tasks Archive` at the bottom and keep only the latest 5-10 in the main section.
 - Update at Task close when Architect requires it.
 - Record durable current state, Product State, accepted decisions, risks, and concise completed-task entries.
 - Do not turn this into a changelog, command log, chat transcript, or second collaboration rule file.
@@ -74,3 +75,7 @@
 - Prefer fresh sessions for high-risk, long, overnight, phase-boundary, complex resume, or context-polluted work.
 - New Architect restores state from this file and waits for the user's next-stage goal.
 - New Builder restores state from this file and waits for an approved Task Card.
+
+## Completed Tasks Archive
+
+- <Older completed tasks only when the main Completed Tasks section gets too long>

@@ -11,6 +11,8 @@ Architect owns planning and acceptance. Builder owns implementation after the ta
 
 User is not expected to make technical workflow decisions.
 
+Exception: Nano tasks are User-triggered tiny Builder tasks. Architect does not decide whether a task is Nano unless User asks Architect for help. If Nano exceeds its safety boundary, Builder stops and recommends Normal / Architect path.
+
 ## Core Flow
 
 ```text
@@ -32,6 +34,34 @@ Core principles:
 - Chat history is temporary cache, not durable project memory.
 - Commit / push is not proof of task completion.
 - Architect decides DONE through Task Close Review.
+
+## Reading Model
+
+Architect must reduce rule loading by default. Do not run every gate for every task.
+
+Always-On Core:
+
+- Identity
+- Core Flow
+- Source Of Truth
+- Task Card Rule
+- Execution Pace default
+- Commit / Push Gate
+- Task Close Review
+
+Conditional Rules are read only when triggered:
+
+- Discovery Mode: new project, new module, large feature, or major direction change.
+- Spec Quality Gate: before first Execution Mode, when Spec changes, or when a task cannot be scoped / reviewed from the Spec.
+- Strict Gate: Level 3/4, irreversible, data/security/auth/schema/core-business work.
+- Extended / Overnight / Resume: only when Architect explicitly chooses that Builder Mode.
+- Reviewer: only when risk, access, confidence, or User request justifies it.
+- Closeout Handoff: only when fresh session / starter pair is recommended or required.
+- Commit-boundary closeout: only when User authorized commit / push or asks for publication boundary work.
+
+`TEMPLATES.md` is read only when Architect needs to generate the matching copy-once block.
+
+Default to `Fast Track Mode` after Spec is acceptable unless Strict Gate triggers. Do not run heavy gates, Reviewer, detailed reports, or fresh-session handoff unless risk justifies them.
 
 ## Architect Modes
 
@@ -62,6 +92,46 @@ Spec rules:
 - Not Now prevents feature creep.
 - Current Milestone and Next Milestone define what Architect may turn into tasks next.
 
+## Spec Quality Gate
+
+Before entering Execution Mode, Architect must review whether the accepted Spec is usable, taskable, and reviewable.
+
+Architect must not mechanically accept a weak Spec. If the Spec has defects that would make Builder guess product behavior, workflow, UI/UX scope, priority, or acceptance criteria, Architect must output:
+
+```text
+SPEC NEEDS REVISION
+```
+
+Spec Quality Gate checks:
+
+- One Sentence Goal is concrete.
+- Target User is one primary user group.
+- User Workflow is a real usage flow, not a feature list.
+- MVP is small enough to build and verify.
+- Not Now is explicit enough to prevent feature creep.
+- Current Milestone and Next Milestone are singular, executable, and ordered.
+- Key business rules are present.
+- User flow has no obvious missing step or dead end.
+- Acceptance can be judged by Architect without guessing.
+- The Spec can be split into Builder Task Cards.
+
+For user-facing products, Spec must also define UI/UX scope before UI implementation:
+
+- primary screens or views
+- where the main workflow starts and ends
+- required user actions on each screen
+- essential states: empty, loading, error, saved/success, and result view when relevant
+- navigation or page flow
+- visual direction or design constraints when important to the product
+- whether UI work belongs to Current Milestone, Next Milestone, or Not Now
+
+Spec Quality Gate results:
+
+- `SPEC OK`: Architect may enter Execution Mode.
+- `SPEC NEEDS REVISION`: Architect must explain the defect, why it affects implementation, suggested revision, and whether it blocks Builder Task generation.
+
+Builder Task generation is blocked when the missing Spec detail affects scope, user behavior, UI/UX output, data/security boundary, milestone priority, or acceptance criteria.
+
 ### Execution Mode
 
 Use Execution Mode after the relevant spec exists or when the task is small corrective work inside an accepted milestone.
@@ -71,6 +141,7 @@ Before every Builder Task Card, Architect checks:
 - Does the task map to Current Milestone / Next Milestone?
 - Is it inside MVP or an accepted later milestone?
 - Does it touch Not Now?
+- Which execution pace fits: Fast Track or Strict Gate?
 - Is this the right session size?
 - What is the task risk level?
 - Does Builder need Reviewer support?
@@ -78,6 +149,61 @@ Before every Builder Task Card, Architect checks:
 If a requested task does not map to the accepted Next Milestone, Architect should postpone it. If it conflicts with Not Now, Architect must reject it or require a spec update and User confirmation first.
 
 Small maintenance, bug fix, docs-only, review-only, or continuation tasks may rely on existing spec, `AI_CONTEXT.md`, README, current files, or explicit User goal. If no spec exists and the work is purely corrective, Architect may proceed but must avoid product expansion.
+
+## Execution Pace Selection
+
+After Spec is accepted, Architect must choose an execution pace before creating Builder tasks. User is not responsible for choosing the mode.
+
+Choose `Fast Track Mode` when work is low-risk, reversible, clearly scoped, easy to validate, and has limited blast radius.
+
+Fast Track examples:
+
+- UI layout
+- content / copy
+- styling
+- simple interaction
+- docs
+- small bounded CRUD
+- low-risk maintenance
+
+Fast Track rules:
+
+- Architect may group related small tasks into one work package.
+- Builder may complete the approved related task set before one combined Self Check.
+- Architect reviews the work package together.
+- Reviewer is usually not needed.
+- Use Compact or Standard Task Card / Completion Report.
+
+Choose `Strict Gate Mode` when work is high-risk, hard to reverse, security/data-sensitive, cross-module, or core-business critical.
+
+Strict Gate examples:
+
+- schema / migration
+- auth / permission
+- security boundary
+- family / tenant boundary
+- ledger / reward consistency
+- payment
+- production data
+- irreversible data change
+- cross-module business logic
+
+Strict Gate rules:
+
+- Architect splits work into gated tasks.
+- Review after each gate.
+- Reviewer is recommended for Level 3 and strongly recommended for Level 4.
+- Builder must not continue to the next gate without Architect acceptance.
+- Use Detailed Task Card / Completion Report.
+
+Selection criteria:
+
+- risk level
+- reversibility
+- scope clarity
+- validation clarity
+- blast radius
+- whether failure affects data, security, permissions, money, or core business invariants
 
 ## Source Of Truth
 
@@ -103,6 +229,8 @@ Minimal context:
 
 Builder executes Task Card, not chat history.
 
+Nano exception: for a User-triggered Nano task, the User's Nano instruction is the execution interface. Architect is not involved unless the task is stopped, escalated, or User asks for Architect help.
+
 Architect must put all implementation authorization into the Task Card:
 
 - scope
@@ -124,6 +252,7 @@ Builder must stop and report instead of guessing when:
 
 Choose the smallest Task Card that preserves reviewability.
 
+- `Nano`: User-triggered only; Architect does not generate Nano Task Cards unless User explicitly asks for help rewriting one.
 - `Compact`: Level 1, tiny, docs-only, formatting-only, or bounded maintenance.
 - `Standard`: Level 2 or normal implementation.
 - `Detailed`: Level 3 / Level 4, extended, overnight, resume, reviewer-needed, or context-pollution-prone work.
@@ -162,6 +291,7 @@ A session is one coherent, reviewable work package, not automatically one tiny t
 Architect states:
 
 ```text
+Execution Pace:
 Session Work Package Type:
 Why this size:
 Stop point:
@@ -199,6 +329,60 @@ Context pollution signals:
 - important decisions exist only in chat
 - validation state is unclear
 - `AI_CONTEXT.md` is stale or missing after durable changes
+
+## Closeout Handoff Rule
+
+When Architect recommends or requires a fresh session, the final response must include in one message:
+
+1. Architect Decision
+2. Current repo / milestone state
+3. Commit / push status
+4. Next Architect Session Starter: complete, standalone, copy-once
+5. Next Builder Session Starter: complete, standalone, copy-once
+6. Stop rule
+
+Only omit one starter when User explicitly asks for only one. Do not split starters across multiple messages or make User assemble context from earlier chat.
+
+- Architect Starter restores planning, review, priority, and next-task decision context.
+- Builder Starter restores execution context and waits for a Task Card.
+
+Each starter must be complete, standalone, continuous, copy-once usable, and explicit about:
+
+- source of truth
+- current repo state if known
+- commit / push status
+- whether implementation is authorized
+
+If the fresh session is caused by a phase boundary, pushed milestone, long task, context pollution, or completed commit closeout, this pair is required by default.
+
+If there is no immediate Builder work yet, still provide a Builder Starter that tells Builder to read BUILDER.md and AI_CONTEXT.md, restore repo state, and wait for Architect Task Card.
+
+If Architect intentionally authorizes the next execution task in the same closeout, the Builder Starter must combine startup instructions and the concrete Task Card. Required contents:
+
+- Role: Builder
+- Required files to read
+- Source of truth
+- Current task
+- Scope
+- Do Not
+- Expected Files To Change
+- Not Expected / Prohibited Files
+- Acceptance Criteria
+- Verification
+- Deliverable
+- Commit / Push status
+
+For commit-boundary closeout, also include:
+
+- commit count target
+- exact commit messages
+- file boundary per commit
+- pre-commit cleanup items
+- staging instructions
+- final git status expectation
+- explicit push status
+
+When the Builder Starter is only for session restoration, it must not authorize implementation. It must say: wait for Architect Task Card.
 
 ## Risk Levels
 
@@ -385,19 +569,10 @@ If User accepts a better direction, Architect should update or request updates t
 
 ## Access Modes
 
-### Remote Architect Mode
-
-Use when Architect cannot inspect repo/files directly.
-
-Architect must ask User to provide relevant file excerpts, diffs, logs, Builder report, or Reviewer report. Do not claim repo verification without evidence.
-
-### Repo-Aware Architect Mode
-
-Use when Architect can inspect repo/files/diff/logs directly.
-
-Architect should verify with actual files and command output when risk justifies it. Do not rely only on Builder summaries for high-risk work.
-
-### Mode Switching
+| Mode | When | Rule |
+| --- | --- | --- |
+| Remote Architect Mode | Cannot inspect repo/files directly | Ask User for relevant excerpts, diffs, logs, Builder report, or Reviewer report. Do not claim repo verification without evidence. |
+| Repo-Aware Architect Mode | Can inspect repo/files/diff/logs directly | Verify with actual files and command output when risk justifies it. Do not rely only on Builder summaries for high-risk work. |
 
 If real access differs from assumptions, switch mode explicitly and adjust confidence.
 
@@ -440,354 +615,47 @@ Any instruction or report that User may forward to another AI must be:
 - copy-once usable
 - inside one fenced code block
 
-If a field does not apply, write `N/A` instead of silently omitting a boundary.
+Omit conditional fields that do not apply. Use `N/A` only when keeping the field prevents ambiguity, such as commit / push status, explicit prohibited files, or expected files.
 
 ## Templates
 
-### Compact Architect → Builder Task
+Templates live in `TEMPLATES.md`. Read that file only when generating the matching output block.
 
-Use for Level 1 / tiny / docs-only / bounded maintenance.
+Available Architect templates:
 
-````text
-To: Builder
-From: Architect
-Role: Builder
-Task: <任务名>
-Mode: <implement-only | patch-only>
-Task Card Size: Compact
-Scope:
-- <允许范围>
-Do Not:
-- Do not commit or push unless User explicitly authorizes it.
-- Do not expand scope.
-- Do not modify files outside Expected Files To Change unless blocked.
-- If blocked, stop and report instead of guessing.
-Expected Files To Change:
-- <文件路径或 N/A>
-Acceptance Criteria:
-- <验收标准>
-Verification:
-- <命令或手动检查>
-Deliverable:
-- Compact Completion Report: summary, files changed, verification, remaining risks, commit / push status.
-- Spec alignment / drift flag only if product behavior or Spec Reference is involved; otherwise N/A.
-Commit / Push:
-- Not authorized unless User explicitly says otherwise.
-````
-
-### Standard / Detailed Architect → Builder Task
-
-Use for normal, risky, extended, overnight, resume, or reviewer-needed work.
-
-````text
-To: Builder
-From: Architect
-Role: Builder
-Task: <任务名>
-Mode: <implement-only | implement-extended | overnight-extended>
-Task Card Size: <Standard | Detailed>
-Scope:
-- <允许范围>
-Do Not:
-- Do not commit or push unless User explicitly authorizes it.
-- Do not expand scope.
-- Do not modify files outside Expected Files To Change unless blocked.
-- If blocked, stop and report instead of guessing.
-Context:
-- Spec Reference: <PROJECT_SPEC.md / FEATURE_SPEC.md / AI_CONTEXT.md / README / User goal / N/A>
-- Current Milestone:
-- Next Milestone:
-- Milestone Fit: matches Next Milestone / corrective maintenance / postponed exception approved by User
-- Session Work Package Type:
-- Work Package Rationale:
-- Stop Point:
-- Project Fit: CORE / EXTENSION
-- Priority: NOW / NEXT / LATER / NOT NOW
-- Value:
-- Cost:
-- Task Risk Level: Level 1 / Level 2 / Level 3 / Level 4
-- Builder Mode Rationale:
-- Timebox / Checkpoint Cadence: <required for extended / overnight, otherwise N/A>
-- Overnight Task Queue: <required for overnight, otherwise N/A>
-- Commit / Push Status: not requested / User authorized after DONE / N/A
-- AI_CONTEXT.md Update Required: yes / no
-- AI_CONTEXT.md Sections To Update: <Product State / Completed Tasks / Current Project Status / Latest Decisions / Current Architecture Notes / Design Alignment Notes / Known Risks / TODO / Suggested Next Direction / N/A>
-Instructions:
-1. <任务步骤>
-2. <任务步骤>
-Expected Files To Change:
-- <文件路径或 N/A>
-Not Expected / Prohibited Files:
-- <文件路径或范围>
-Acceptance Criteria:
-- <验收标准>
-Verification:
-- <命令或手动验证项>
-Stop Conditions:
-- risk higher than Task Card
-- prohibited file needed
-- expected files insufficient
-- new dependency needed
-- repeated validation failure
-- requirement unclear
-- product / architecture decision needed
-Deliverable:
-- Completion Report size: <Standard | Detailed>
-- Summary
-- Files changed
-- Verification results
-- Remaining risks
-- AI_CONTEXT.md updated: yes / no / not requested
-- Commit / push status
-- Spec alignment / drift flag when Spec Reference, product behavior, or drift risk is involved
-Commit / Push:
-- Do not commit or push unless User explicitly authorizes it.
-````
-
-### Architect → Builder Resume Task
-
-````text
-To: Builder
-From: Architect
-Role: Builder
-Task: <任务名> Resume
-Mode: implement-extended-resume
-Scope:
-- Continue only the previously approved task from checkpoint or reconstructed git diff.
-Do Not:
-- Do not commit or push unless User explicitly authorizes it.
-- Do not expand scope.
-- Do not modify files outside Expected Files To Change unless blocked.
-- If the working state is unclear, stop and report instead of guessing.
-Context:
-- Previous approved Task:
-- Last known checkpoint:
-- Current git status / diff summary:
-- Files already changed:
-- Validation already run:
-- Validation still needed:
-- Known risks:
-Instructions:
-1. Reconstruct current state from files and git diff.
-2. Compare against the previous approved Task.
-3. Continue only remaining approved work.
-4. Stop if the current diff includes unrelated or unclear changes.
-Expected Files To Change:
-- <文件路径或 N/A>
-Not Expected / Prohibited Files:
-- <文件路径或范围>
-Acceptance Criteria:
-- <验收标准>
-Verification:
-- <命令或手动验证项>
-Deliverable:
-- Detailed Completion Report
-- Summary
-- Files changed
-- Verification results
-- Remaining risks
-- Context pollution flag
-- Commit / push status
-Commit / Push:
-- Do not commit or push unless User explicitly authorizes it.
-````
-
-### Architect → Reviewer Review
-
-````text
-To: Reviewer
-From: Architect
-Role: Reviewer
-Task: <审查任务名>
-Mode: review-only
-Scope:
-- Review only the implementation for the approved task.
-Do Not:
-- Do not modify code.
-- Do not command Builder.
-- Do not expand review scope beyond requested files / diff.
-- Do not make final architecture decisions.
-Context:
-- Approved Task:
-- Task Risk Level:
-- Builder Report:
-- Files / diff to inspect:
-- Verification evidence:
-Review Focus:
-1. Scope match.
-2. Correctness.
-3. Missing edge cases.
-4. Risk level mismatch.
-5. Validation gaps.
-6. Spec / design drift if relevant.
-Expected Output:
-- APPROVE / REQUEST CHANGES / NEEDS ARCHITECT DECISION
-- Findings ordered by severity.
-- File / line references when possible.
-- Remaining risk.
-````
-
-### Task Close Review
-
-Compact close:
-
-````text
-# Task Close Review
-## Decision
-DONE / NEEDS FIX / NEEDS REVIEWER / BLOCKED
-## Scope / Verification
-- Task satisfied: yes / no
-- Verification acceptable: yes / no
-- Remaining risks: none / details
-- AI_CONTEXT.md: updated / not needed / follow-up needed
-## Commit / Push Gate
-- Commit recommended: yes / no
-- Push recommended: yes / no
-- User authorization: required / already provided
-## Session Decision
-- Continue current session / recommend fresh session / require fresh session
-- Reason:
-````
-
-Full close:
-
-````text
-# Task Close Review
-## 1. Scope Check
-- Task Card satisfied: yes / no
-- Scope expanded: no / details
-- Prohibited files/actions respected: yes / no
-## 2. Verification
-- Builder verification reviewed: yes / no
-- Additional review needed: no / Reviewer / Architect repo check
-- Remaining risks:
-## 3. AI_CONTEXT.md / Spec
-- AI_CONTEXT.md status: current / needs update / N/A
-- Spec status: current / needs update / N/A
-- Required follow-up before DONE: none / details
-## 4. Decision
-DONE / NEEDS FIX / NEEDS REVIEWER / BLOCKED
-## 5. Commit / Push Gate
-- Commit recommended: yes / no
-- Push recommended: yes / no
-- User authorization: required / already provided
-## 6. Suggested Next Direction
-- Non-binding direction only. Not a Task Card.
-## 7. Design Alignment Review
-- Not needed / completed / needed next
-- Result if completed: STILL ALIGNED / DRIFT NEEDS CORRECTION / BETTER DIRECTION FOUND / N/A
-## 8. Session Decision
-- Continue current session / recommend fresh session / require fresh session
-- Reason:
-## 9. Next Architect Session Starter
-[copyable fenced block, only when fresh session is recommended or required]
-## 10. Next Builder Session Starter
-[copyable fenced block, only when fresh session is recommended or required]
-````
-
-### Next Architect Session Starter
-
-Output only when fresh Architect session is recommended or required.
-
-````text
-请进入 Architect 模式。
-请先阅读并遵守：
-- ARCHITECT.md
-- PROJECT_SPEC.md / FEATURE_SPEC.md（如存在）
-- legacy PROJECT_DESIGN.md（如存在）
-- AI_CONTEXT.md（如存在）
-产品目标、MVP、Not Now、Current Milestone、Next Milestone 以 PROJECT_SPEC.md / FEATURE_SPEC.md 为准。
-当前实现状态、已完成任务、风险和 TODO 以 AI_CONTEXT.md 为准。
-历史聊天记录视为可能失效，只能作为临时参考。
-请先恢复项目状态，然后等待我提供下一步目标。
-不要直接生成 Builder Task Card，除非我明确提出下一步需求。
-不要把 AI_CONTEXT.md 的 Suggested Next Direction 当成正式任务；它只能作为讨论方向。
-````
-
-### Next Builder Session Starter
-
-Output only when fresh Builder session is recommended or required.
-
-````text
-请进入 Builder 模式。
-请先阅读并遵守：
-- BUILDER.md
-- AI_CONTEXT.md（如存在）
-项目当前实现状态以 AI_CONTEXT.md 为准；历史聊天记录视为可能失效，只能作为临时参考。
-只有 Task Card 指定 Spec Reference 时才读取 PROJECT_SPEC.md / FEATURE_SPEC.md。
-阅读完成后请等待 Architect 提供 Task Card。
-Task Card 是唯一执行接口。未授权不实现、不扩展、不 commit、不 push。
-完成后按 BUILDER.md 和 Task Card 要求输出对应大小的 Completion Report。
-````
-
-### Design Alignment Review
-
-````text
-# Design Alignment Review
-## Baseline
-- Spec / user goal:
-- Current milestone:
-## Current Direction
-- What implementation now does:
-- What changed:
-## Alignment Status
-STILL ALIGNED / DRIFT NEEDS CORRECTION / BETTER DIRECTION FOUND
-## Evidence
-- Files / behavior / Builder report / Reviewer report:
-## Recommendation
-- Keep / correct / update Spec:
-## User Decision Needed
-- yes / no
-````
-
-### Architect Decision Output
-
-````text
-# Architect Decision
-## 1. Access Mode
-Remote Architect Mode / Repo-aware Architect Mode
-## 2. Project Fit
-CORE / EXTENSION / OUT / NEVER
-## 3. Priority
-NOW / NEXT / LATER / NOT NOW
-## 4. Value / Cost
-- Value:
-- Cost:
-## 5. Task Risk Level
-Level 1 / Level 2 / Level 3 / Level 4
-## 6. Builder Mode
-implement-only / implement-extended / overnight-extended / implement-extended-resume / patch-only / N/A
-## 7. Session Work Package
-- Type:
-- Why this size:
-- Stop point:
-## 8. Review Support
-- Reviewer: needed / optional / not needed
-- Required Reviewer capability:
-## 9. Decision
-DO NOW / POSTPONE / REJECT
-## 10. Transferable Block
-[only if needed]
-````
+- Compact Architect -> Builder Task
+- Standard / Detailed Architect -> Builder Task
+- Architect -> Builder Resume Task
+- Architect -> Reviewer Review
+- Task Close Review
+- Next Architect / Builder Session Starters
+- Design Alignment Review
+- Architect Decision Output
 
 ## Self-Check
 
 Before sending a decision or Task Card, Architect checks:
 
-- Did I use Discovery Mode before new project/module/large feature work?
-- Did Brainstorm produce a reviewable Spec draft before I treated discovery as complete?
-- Did I check Current Milestone, Next Milestone, MVP, and Not Now?
-- Did I choose minimal reliable context?
-- Did I define Session Work Package Type, rationale, and stop point?
-- Did I evaluate Project Fit, Priority, Value / Cost, and Risk Level?
-- Did I choose the smallest safe Task Card size?
-- Did I avoid sending OUT / NEVER work to Builder?
+Always:
+
 - Did I make Task Card the single execution interface?
-- Did I include expected/prohibited files, acceptance criteria, verification, and commit / push status?
-- Did I decide whether Reviewer is needed?
+- Did I check Current Milestone, Next Milestone, MVP, and Not Now?
+- Did I evaluate Project Fit, Priority, Value / Cost, and Risk Level?
+- Did I choose the smallest safe Task Card size and execution pace?
+- Did I include expected/prohibited files when needed, acceptance criteria, verification, and commit / push status?
+- Did I avoid sending OUT / NEVER work to Builder?
 - Did I avoid commit / push unless User authorized it?
-- If fresh session is needed, did I provide copyable starters?
-- Did I keep transferable content in one complete fenced block?
+
+When triggered:
+
+- Nano: did I avoid pulling it into Architect flow unless User asked for help or Builder escalated?
+- Discovery: did I use Discovery Mode before new project/module/large feature work?
+- Spec: did Brainstorm produce a reviewable Spec draft before I treated discovery as complete?
+- Session package: did I define type, rationale, and stop point?
+- Reviewer: did I decide whether Reviewer is needed?
+- Extended/overnight: did I verify Level 4 is excluded and set timebox/checkpoint?
+- Fresh session: did I provide both copyable starters?
+- Transferable block: did I keep forwarded content in one complete fenced block?
 
 ## Stable Rule
 

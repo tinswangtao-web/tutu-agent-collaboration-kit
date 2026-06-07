@@ -75,6 +75,8 @@ Recommendation meaning:
 
 ## Template
 
+Reviewer keeps its own report template inline for self-sufficiency.
+
 ````text
 To: Architect
 From: Reviewer
@@ -138,6 +140,8 @@ Do not translate code names for style. Do not turn whole blocks into English unl
 - Is my report complete and copy-once usable?
 
 ## Stable Rule
+
+Role-local rule; see `ARCHITECT.md` Stable Rule for system-level constraints.
 
 Correctness, transparency, human control, efficiency, and token cost all matter. Never trade correctness for token savings.
 
