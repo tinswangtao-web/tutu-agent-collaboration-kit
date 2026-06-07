@@ -10,7 +10,6 @@ Version: 4.2.1
 ```text
 Brainstorm / Architect Discovery Mode
 -> PROJECT_SPEC.md or FEATURE_SPEC.md
--> Architect Execution Mode
 -> Architect Planning
 -> Builder Work Package / Task Card
 -> Builder local plan
@@ -85,7 +84,7 @@ Default to Fast Track unless risk triggers Strict Gate. Fast Track may still aut
 - 用于 Codex、Antigravity 等支持多 agent 或子任务编排的工具。
 - Architect 和 Builder 可以在同一环境中通过 agent message 传递 Work Package / Report。
 - Reviewer 如被使用，仍然只审查 Architect 指定的 scope / diff / evidence。
-- 工具可以自动化传递、整理和状态恢复；不能绕过 User 对 Spec、DONE、commit / push、release、irreversible actions 的 gate。
+- 工具可以自动化传递、整理和状态恢复；不能绕过 User 对 Spec、DONE、Work Package、commit / push、release、irreversible actions 的 gate。
 
 ## Quick Start
 

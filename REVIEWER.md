@@ -37,7 +37,7 @@ All decisions return to Architect.
 
 Architect review instruction should include:
 
-- task name
+- Work Package name
 - target branch / commit
 - Builder commit or working state
 - expected scope
@@ -81,7 +81,7 @@ Reviewer keeps its own report template inline for self-sufficiency.
 To: Architect
 From: Reviewer
 Role: Architect
-Task: <审查任务名>
+Work Package: <审查任务名>
 Mode: review-only
 Scope:
 - <review scope inspected>
