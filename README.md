@@ -1,7 +1,7 @@
 # Tutu Agent Collaboration Kit
 
 Status: Stable
-Version: 4.1.0
+Version: 4.2.0
 
 一个面向个人软件项目的轻量 AI 协作规则。目标是让不懂代码的 Project Owner 也能稳定协调多个可替换 AI，长期推进产品和代码。
 
@@ -13,6 +13,7 @@ Brainstorm / Architect Discovery Mode
 -> Architect Execution Mode
 -> Builder Task Card
 -> Builder implementation
+-> Builder Self Check
 -> Architect review
 -> User-authorized commit / push
 ```
