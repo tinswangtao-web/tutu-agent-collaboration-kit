@@ -1,73 +1,43 @@
-# PROJECT_SPEC
+# PROJECT_SPEC.md
 
-> Copy this file into a project repo as `PROJECT_SPEC.md` after Brainstorm / Architect Discovery Mode.
-> This file defines product intent only. Do not put implementation details, code plans, command logs, or handoff notes here.
+Version: 4.3.2-efficiency-slim
 
-## One Sentence Goal
+项目设计文档。用于说明 Project Owner 的产品目标和长期边界，不直接授权 Builder 实现。
 
-- <One sentence describing what the product helps the target user accomplish.>
+## 1. Product Goal
 
-## Target User
+这个项目要解决什么问题？
 
-- Primary user: <one primary user group only>
+## 2. Users
 
-## User Workflow
+谁会使用？主要场景是什么？
 
-Use real user actions. Do not discuss technical implementation.
+## 3. MVP Scope
 
-```text
-Open
-→ <operate>
-→ <save / submit>
-→ <view result>
-```
+第一版必须有：
 
-## UI / UX Scope
+- 
 
-For user-facing products, define the experience before UI implementation. Do not discuss technical implementation.
+第一版不做：
 
-- Primary screens / views:
-- Main workflow start:
-- Main workflow end:
-- Required user actions per screen:
-- Essential states:
-  - empty:
-  - loading:
-  - error:
-  - saved / success:
-  - result view:
-- Navigation / page flow:
-- Visual direction or design constraints:
-- UI milestone: Current Milestone / Next Milestone / Not Now
+- 
 
-## MVP
+## 4. Core Workflow
 
-The smallest runnable useful version MUST include:
+用户如何完成主要任务？
 
-- <MVP item 1>
-- <MVP item 2>
-- <MVP item 3>
+## 5. Data / Content
 
-## Not Now
+需要记录哪些数据或内容？
 
-Explicitly out of scope for the current milestone:
+## 6. Platform / Tech Constraints
 
-- <feature / module / optimization not allowed now>
-- <feature / module / optimization not allowed now>
+平台、设备、性能、隐私、部署限制。
 
-## Current Milestone
+## 7. Open Questions
 
-- <current product milestone>
+需要 User 或 Architect 继续判断的问题。
 
-## Next Milestone
+## 8. Release Criteria
 
-- <the single next milestone Architect may turn into Builder Task Cards>
-
-## Spec Update Rule
-
-- Architect owns this file.
-- Brainstorm / Discovery Mode produces or updates this file.
-- Architect must run Spec Quality Gate before Execution Mode.
-- User must confirm new projects, new modules, large features, and major direction changes before Builder Task Cards are generated.
-- Builder does not reinterpret, expand, or modify this file unless an Architect Task Card explicitly asks for a spec file update.
-- `AI_CONTEXT.md` may summarize current Product State, but this file remains the product spec source of truth.
+什么情况下可以认为第一版可用？
