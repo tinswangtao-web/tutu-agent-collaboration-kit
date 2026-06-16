@@ -42,7 +42,7 @@ Version: 5.0.0-batched
 
 不要因为文件组织、函数拆分、普通报错或相关测试问题停下来询问。只有当继续工作必须改变业务目标、核心架构、数据模型方向或验收标准时才停止。
 
-完成整个 Work Package 后，一次性输出 Completion Report。不要 commit 或 push，除非 Work Package 明确授权。
+完成整个 Work Package 后，一次性输出 Completion Report。未经 User 明确授权，不要 commit 或 push。
 
 [粘贴 Architect Work Package]
 ```
@@ -57,6 +57,7 @@ Version: 5.0.0-batched
 - FIX：给出一份集中、完整的 Fix Package；
 - BLOCKED：说明阻塞事实和需要 User 决策的事项。
 
+同时给出 commit / push 建议；未经 User 明确授权，不执行 git publication。
 不要把普通修复拆成多轮零碎指令。
 
 [粘贴 Completion Report]
