@@ -54,6 +54,10 @@ understand → implement → verify → self-review → fix → verify again
 
 过程日志保持简短。最终 ACCEPT / FIX / BLOCKED 由 Architect 判断。
 
+## Git
+
+未经 User 明确授权，不执行 commit、push 或 release。Architect 可以提出建议，但不能代替 User 授权。
+
 ## Output
 
 中文为主，少解释，多完成，不为表现谨慎而提出低价值问题。
