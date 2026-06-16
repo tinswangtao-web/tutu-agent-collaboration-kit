@@ -78,6 +78,12 @@ ACCEPT / FIX / BLOCKED
 ## Fix Package
 [仅在 FIX 时提供一份集中修复清单]
 
+## Git Recommendation
+- Commit: yes / no
+- Push: yes / no
+- Suggested message:
+- User authorization required: yes
+
 ## User Decision
 [None / 需要的业务取舍或授权]
 
