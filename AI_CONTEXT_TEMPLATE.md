@@ -1,6 +1,6 @@
 # AI_CONTEXT.md
 
-Version: 5.0.0-batched
+Version: 5.0.1-batched
 
 本文件只记录项目事实，帮助新 Architect session 恢复上下文。
 
