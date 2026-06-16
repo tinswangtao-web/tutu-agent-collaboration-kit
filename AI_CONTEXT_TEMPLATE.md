@@ -1,10 +1,10 @@
 # AI_CONTEXT.md
 
-Version: 4.3.2-efficiency-slim
+Version: 5.0.0-batched
 
-本文件记录项目状态，帮助新 Architect session 恢复上下文。
+本文件只记录项目事实，帮助新 Architect session 恢复上下文。
 
-它不是授权文件。只有 active Architect 创建的 Work Package 才能授权 Builder 实现。
+它不是实现授权，也不替代 Architect 的 Batch Work Package。
 
 ## Project
 
@@ -14,33 +14,15 @@ Version: 4.3.2-efficiency-slim
 
 ## Current State
 
-- Last completed task:
+- Last accepted stage:
 - Current branch / commit:
 - Working tree status:
 - Important files:
+- Known risks or blockers:
 
-## Decisions
+## Next Direction
 
-- Confirmed decisions:
-- Rejected options:
-- Open questions:
+- Suggested next stage:
+- Open business decisions:
 
-## Recent Changes
-
-- Files changed:
-- What changed:
-- Verification:
-- Risks:
-
-## Suggested Next Direction
-
-这里可以写下一步建议，但不授权 Builder 实现。
-
-- Suggested next step:
-- Why:
-- Needs Architect Work Package: yes
-
-## Session Notes
-
-- Context risks:
-- Need fresh Architect session: yes / no
+本文件可以提出方向，但不能授权 Builder 开始实现。
