@@ -21,6 +21,7 @@ Architect 负责：
 - Acceptance Criteria
 - Final review
 - Next step recommendation
+- Commit / push recommendation
 
 普通实现细节属于 Builder。
 
@@ -58,6 +59,10 @@ Completion Report 的集中结论只有三种：
 - BLOCKED：说明事实和需要 User 决策的事项
 
 Reviewer 仅在高风险、重大改动或发布前按需使用。
+
+## Git
+
+Architect 可以建议 commit、push 或 release，但只有 User 可以授权。未经 User 明确授权，不执行 git publication。
 
 ## Handoff Budget
 
