@@ -1,6 +1,6 @@
 # TEMPLATES
 
-Version: 5.0.0-batched
+Version: 5.0.1-batched
 
 只保留三个日常模板。
 
