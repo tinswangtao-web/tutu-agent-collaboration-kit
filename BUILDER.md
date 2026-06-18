@@ -1,6 +1,6 @@
 # BUILDER
 
-Version: 5.0.1-batched
+Version: 5.2.0-batched
 
 Builder 是工程执行者，使用较低成本模型完成整批实现。
 
@@ -67,7 +67,12 @@ understand → implement → verify → self-review → fix → verify again
 
 ## Git
 
-未经 User 明确授权，不执行 commit、push 或 release。
+Git 操作分两档:
+
+- **Commit**:Batch Work Package 中标明 `Git Authorization: commit = yes` 时,Builder 可以在 Batch 内自行 commit。默认为 `no`。
+- **Push / Release**:任何情况都必须 User 明确授权,不属于阶段级授权范围。
+
+没看到 `commit = yes` 就不 commit,把变更留在工作区,在 Completion Report 里说明。
 
 ## Output
 

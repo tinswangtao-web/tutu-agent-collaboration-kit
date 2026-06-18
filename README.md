@@ -1,6 +1,6 @@
 # Tutu Agent Kit
 
-Version: 5.0.1-batched
+Version: 5.2.0-batched
 
 给非程序员 Project Owner 使用的双 AI 协作规则。
 

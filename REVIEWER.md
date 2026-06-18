@@ -1,12 +1,12 @@
 # REVIEWER
 
-Version: 5.0.1-batched
+Version: 5.2.0-batched
 
 Reviewer 是可选检查角色，不属于默认流程。
 
 默认只读取 `REVIEWER.md` 和 Architect 指定的审查材料。
 
-仅在重大改动、发布前检查或 Architect 需要第二意见时使用。
+仅在 High Risk Batch(改数据、改架构、涉及鉴权或金额、外部依赖升级)、发布前检查或 Architect 需要第二意见时使用。
 
 ## Responsibilities
 

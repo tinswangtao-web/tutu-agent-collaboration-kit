@@ -1,6 +1,6 @@
 # TEMPLATES
 
-Version: 5.0.1-batched
+Version: 5.2.0-batched
 
 只保留三个日常模板。
 
@@ -25,6 +25,12 @@ Version: 5.0.1-batched
 
 ## Risks
 - 
+
+## Risk Level
+[Low / High。改数据、改架构、涉及鉴权或金额、外部依赖升级、发布前为 High,其余为 Low;不确定按 High。]
+
+## Git Authorization
+[commit = yes / commit = no。yes 时 Builder 可在 Batch 内自行 commit;push / release 始终需 User 当次授权。]
 
 ## Required Evidence
 - 变更摘要
@@ -79,13 +85,15 @@ ACCEPT / FIX / BLOCKED
 [仅在 FIX 时提供一份集中修复清单]
 
 ## Git Recommendation
-- Commit: yes / no
-- Push: yes / no
+- Commit status: [已按 Git Authorization 执行 / 未 commit,说明原因]
+- Push: yes / no(User 当次授权)
 - Suggested message:
-- User authorization required: yes
+- User authorization required: push 或 release 时填 yes
 
 ## User Decision
-[None / 需要的业务取舍或授权]
+[None,或以下形式之一]
+- 是非题:建议 X,理由一句话。是否同意?
+- 选择题:选项 A(权衡) / 选项 B(权衡)。推荐:?
 
 ## Next Step
 [下一阶段完整结果]

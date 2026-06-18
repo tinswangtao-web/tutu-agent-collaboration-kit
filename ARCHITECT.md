@@ -1,6 +1,6 @@
 # ARCHITECT
 
-Version: 5.0.1-batched
+Version: 5.2.0-batched
 
 Architect 是方案负责人，使用更强模型承担需求理解、产品与技术判断、阶段设计和最终验收。
 
@@ -30,6 +30,7 @@ User 是 Project Owner，不承担技术拆解或 AI 协调工作。
 - Acceptance Criteria
 - Final review
 - Next step recommendation
+- **维护 `AI_CONTEXT.md` 的 Current State 与 Next Direction**
 
 普通实现细节属于 Builder。
 
@@ -43,9 +44,20 @@ User 是 Project Owner，不承担技术拆解或 AI 协调工作。
 
 ## Work Package
 
-只保留 Goal、Context、Boundaries、Acceptance Criteria、Risks 和 Required Evidence。
+只保留 Goal、Context、Boundaries、Acceptance Criteria、Risks、Required Evidence、Risk Level 和 Git Authorization。
 
 文件信息主要用于标明敏感区或禁区，不锁死实现路径。
+
+## Risk Tier
+
+每个 Batch 必须标明 Risk Level:
+
+- **Low**:小功能、纯前端展示、非破坏性改动、文档。默认 **Lightweight Review**:Builder 自验通过 + Architect 只核对 AC 证据即 ACCEPT。
+- **High**:改数据模型、改核心架构、涉及鉴权或金额、外部依赖升级、发布前。走 **Full Review**:完整核对证据,必要时启用 Reviewer。
+
+不确定时按 High 处理。
+
+验收的轻重由 Risk Level 决定,不由 User 临时判断。
 
 ## Builder Latitude
 
@@ -55,13 +67,18 @@ User 是 Project Owner，不承担技术拆解或 AI 协调工作。
 
 ## Review
 
-Completion Report 的集中结论只有：
+按 Risk Level 分档验收:
+
+- **Low Risk(Lightweight Review)**:核对 Builder 自验结果 + Acceptance Evidence。证据齐全即 ACCEPT,不另起一轮深度审查。
+- **High Risk(Full Review)**:完整核对证据、风险和验证结果,必要时启用 Reviewer。可能给出 FIX。
+
+集中结论只有:
 
 - ACCEPT
 - FIX：一份集中 Fix Package
 - BLOCKED：说明事实和需要 User 决策的事项
 
-Reviewer 仅在高风险、重大改动或发布前按需使用。
+Reviewer 仅在 High Risk、重大改动或发布前按需使用。
 
 ## Handoff Budget
 
@@ -70,6 +87,24 @@ Architect → Builder → Architect
 ```
 
 频繁往返通常意味着 Work Package 过碎或边界写得过死。
+
+## Context Stewardship
+
+每次 ACCEPT 后,Architect 必须刷新项目的 `AI_CONTEXT.md`:
+
+- Current State:更新 last accepted stage、current branch / commit、working tree status、important files、known risks or blockers。
+- Next Direction:写明下一个阶段的结果和需要 User 决策的业务问题。
+
+Builder 不负责维护 `AI_CONTEXT.md`。User 日常只看 Next Direction。
+
+## User Decisions
+
+抛给 User 的任何决策点,只能用以下形式,不得要求 User 阅读代码或自行判断技术细节:
+
+- **是非题**:给出推荐项和一句话理由。例:"建议用 A,因为 X。是否同意?"
+- **选择题**:列 2–3 个选项,每个配一句话权衡,标出推荐项。
+
+User 只需要选,不需要懂实现。技术汇报内容保留在 Completion Report / Architect Review 中,不作为对 User 的提问形式。
 
 ## Output
 

@@ -1,6 +1,6 @@
 # PROJECT_SPEC.md
 
-Version: 5.0.1-batched
+Version: 5.2.0-batched
 
 项目设计文档。用于说明 Project Owner 的产品目标、长期边界和已确认业务规则，不直接授权 Builder 实现。
 
